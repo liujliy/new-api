@@ -49,8 +49,7 @@ func Distribute() func(c *gin.Context) {
 			abortWithOpenAiMessage(c, http.StatusForbidden, "您当前不在允许使用的时间范围内")
 			return
 		}
-		userId := c.GetInt("id")
-    
+
 		var channel *model.Channel
 		channelId, ok := c.Get("specific_channel_id")
 		modelRequest, shouldSelectChannel, err := getModelRequest(c)
