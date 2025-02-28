@@ -22,6 +22,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 )
@@ -158,42 +159,48 @@ func TextHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 	//} else {
 	//
 	//}
-	// 有会话ID则存储会话消息
-	// 存储用户消息
-	if textRequest.ConversationID != "" {
-		// 从textRequest中获取最新的用户消息
-		var title string
-		userMessage := textRequest.Messages[len(textRequest.Messages)-1]
-		if userMessage.Role == "user" {
-			createConversationReq := dto.CreateMessageRequest{
-				ConversationID: textRequest.ConversationID,
-				Role:           "user",
-			}
-			var inputText string
-			if userMessage.IsStringContent() {
-				inputText = userMessage.StringContent()
-				createConversationReq.Content = userMessage.StringContent()
-				createConversationReq.ContentType = "text"
-			} else {
-				for _, item := range userMessage.ParseContent() {
-					if item.Type == "text" {
-						inputText = item.Text
-					}
+	var title string
+	var inputText string
+	messgae := model.Message{
+		ConversationID: textRequest.ConversationID,
+		ExchangeID:     uuid.New().String(),
+		Role:           "user",
+	}
+	userMessage := textRequest.Messages[len(textRequest.Messages)-1]
+	if userMessage.Role == "user" {
+		if userMessage.IsStringContent() {
+			inputText = userMessage.StringContent()
+			messgae.Content = userMessage.StringContent()
+			messgae.ContentType = "text"
+		} else {
+			for _, item := range userMessage.ParseContent() {
+				if item.Type == "text" {
+					inputText = item.Text
 				}
-				contentBytes, _ := json.Marshal(userMessage.ParseContent())
-				createConversationReq.Content = string(contentBytes)
-				createConversationReq.ContentType = "multi"
 			}
-			model.CreateMessage(createConversationReq)
-			if utf8.RuneCountInString(inputText) < 20 {
-				title = inputText
-			} else {
-				title = common.SubStr(inputText, 20)
-			}
+			contentBytes, _ := json.Marshal(userMessage.ParseContent())
+			messgae.Content = string(contentBytes)
+			messgae.ContentType = "multi"
 		}
-		relayInfo.ConversationID = textRequest.ConversationID
+		if utf8.RuneCountInString(inputText) < 20 {
+			title = inputText
+		} else {
+			title = common.SubStr(inputText, 20)
+		}
+	}
+	// 输入长度限制
+	inputLengthLimit := c.GetInt("input_length_limit")
+	if inputLengthLimit != 0 && utf8.RuneCountInString(inputText) > inputLengthLimit {
+		return service.OpenAIErrorWrapper(err, "您的问题超出长度限制", http.StatusForbidden)
+	}
+
+	// 有会话ID则存储会话消息
+	if textRequest.ConversationID != "" {
+		messgae.Insert()
 		// 更新Coversation的标题
 		model.UpdateConversationTitle(textRequest.ConversationID, title)
+		relayInfo.ConversationID = textRequest.ConversationID
+		relayInfo.ExchangeID = messgae.ExchangeID
 	}
 
 	convertedRequest, err := adaptor.ConvertRequest(c, relayInfo, textRequest)
@@ -412,13 +419,16 @@ func postConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo,
 	model.RecordConsumeLog(ctx, relayInfo.UserId, relayInfo.ChannelId, promptTokens, completionTokens, logModel,
 		tokenName, quota, logContent, relayInfo.TokenId, userQuota, int(useTimeSeconds), relayInfo.IsStream, relayInfo.Group, other)
 
+	// 回复完成后记录消息
 	if relayInfo.ConversationID != "" {
-		model.CreateMessage(dto.CreateMessageRequest{
+		message := model.Message{
 			ConversationID: relayInfo.ConversationID,
+			ExchangeID:     relayInfo.ExchangeID,
 			Role:           "assistant",
 			Content:        usage.Content,
 			ContentType:    "text",
-		})
+		}
+		message.Insert()
 	}
 	//if quota != 0 {
 	//

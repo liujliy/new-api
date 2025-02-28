@@ -230,7 +230,7 @@ func TokenAuth() func(c *gin.Context) {
 		c.Set("allow_ips", token.GetIpLimitsMap())
 		c.Set("start_time_limit", token.StartTimeLimit)
 		c.Set("end_time_limit", token.EndTimeLimit)
-		c.Set("input_length_limit", 10)
+		c.Set("input_length_limit", token.InputLengthLimit)
 		c.Set("token_group", token.Group)
 		if len(parts) > 1 {
 			if model.IsAdmin(token.UserId) {

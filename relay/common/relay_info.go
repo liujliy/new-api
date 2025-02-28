@@ -14,6 +14,7 @@ import (
 
 type RelayInfo struct {
 	ConversationID            string
+	ExchangeID                string
 	ChannelType               int
 	ChannelId                 int
 	TokenId                   int

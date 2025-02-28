@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"one-api/dto"
 	"one-api/model"
 
 	"github.com/gin-gonic/gin"
@@ -28,16 +27,16 @@ func GetConversations(c *gin.Context) {
 
 // CreateConversation 创建新的会话
 func CreateConversation(c *gin.Context) {
-	userId := c.GetInt("id")
-	var req dto.CreateConversationRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	var conversation model.Conversation
+	if err := c.ShouldBindJSON(&conversation); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": err.Error(),
 		})
 		return
 	}
-	conversationId, err := model.CreateConversation(userId, req)
+	conversation.UserID = c.GetInt("id")
+	conversationId, err := conversation.Insert()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
