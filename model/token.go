@@ -25,8 +25,8 @@ type Token struct {
 	ModelLimitsEnabled bool           `json:"model_limits_enabled" gorm:"default:false"`
 	ModelLimits        string         `json:"model_limits" gorm:"type:varchar(1024);default:''"`
 	AllowIps           *string        `json:"allow_ips" gorm:"default:''"`
-	StartTimeLimit     time.Time      `json:"start_time_limit"`
-	EndTimeLimit       time.Time      `json:"end_time_limit"`
+	StartTimeLimit     *time.Time     `json:"start_time_limit"`
+	EndTimeLimit       *time.Time     `json:"end_time_limit"`
 	InputLengthLimit   int            `json:"input_length_limit" gorm:"default:0"` // 0 means no limit
 	UsedQuota          int            `json:"used_quota" gorm:"default:0"`         // used quota
 	Group              string         `json:"group" gorm:"default:''"`
