@@ -55,6 +55,7 @@ type RelayInfo struct {
 	UserSetting          map[string]interface{}
 	UserEmail            string
 	UserQuota            int
+	OutputImageInfo      string
 }
 
 // 定义支持流式选项的通道类型

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"one-api/common"
@@ -13,6 +12,8 @@ import (
 	"one-api/service"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func oaiImage2Ali(request dto.ImageRequest) *AliImageRequest {
@@ -27,7 +28,7 @@ func oaiImage2Ali(request dto.ImageRequest) *AliImageRequest {
 }
 
 func updateTask(info *relaycommon.RelayInfo, taskID string, key string) (*AliResponse, error, []byte) {
-	url := fmt.Sprintf("/api/v1/tasks/%s", taskID)
+	url := fmt.Sprintf("%s/api/v1/tasks/%s", info.BaseUrl, taskID)
 
 	var aliResponse AliResponse
 
@@ -167,6 +168,7 @@ func aliImageHandler(c *gin.Context, resp *http.Response, info *relaycommon.Rela
 
 	fullTextResponse := responseAli2OpenAIImage(c, aliResponse, info, responseFormat)
 	jsonResponse, err := json.Marshal(fullTextResponse)
+	info.OutputImageInfo = string(jsonResponse)
 	if err != nil {
 		return service.OpenAIErrorWrapper(err, "marshal_response_body_failed", http.StatusInternalServerError), nil
 	}

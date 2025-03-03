@@ -423,12 +423,24 @@ func postConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo,
 
 	// 回复完成后记录消息
 	if relayInfo.ConversationID != "" {
+		var content string
+		var contentType string
+		if relayInfo.RelayMode == relayconstant.RelayModeChatCompletions {
+			contentType = "text"
+			content = usage.Content
+		} else if relayInfo.RelayMode == relayconstant.RelayModeImagesGenerations {
+			contentType = "image"
+			content = relayInfo.OutputImageInfo
+		} else {
+			contentType = "text"
+			content = ""
+		}
 		message := model.Message{
 			ConversationID: relayInfo.ConversationID,
 			ExchangeID:     relayInfo.ExchangeID,
 			Role:           "assistant",
-			Content:        usage.Content,
-			ContentType:    "text",
+			Content:        content,
+			ContentType:    contentType,
 		}
 		message.Insert()
 	}

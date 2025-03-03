@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"one-api/common"
@@ -16,6 +15,10 @@ import (
 	"one-api/service"
 	"one-api/setting"
 	"strings"
+	"unicode/utf8"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func getAndValidImageRequest(c *gin.Context, info *relaycommon.RelayInfo) (*dto.ImageRequest, error) {
@@ -132,6 +135,35 @@ func ImageHelper(c *gin.Context) *dto.OpenAIErrorWithStatusCode {
 	adaptor.Init(relayInfo)
 
 	var requestBody io.Reader
+
+	messgae := model.Message{
+		ConversationID: imageRequest.ConversationID,
+		ExchangeID:     uuid.New().String(),
+		Role:           "user",
+		Content:        imageRequest.Prompt,
+		ContentType:    "text",
+	}
+	var title string
+	inputText := imageRequest.Prompt
+	if utf8.RuneCountInString(inputText) < 20 {
+		title = inputText
+	} else {
+		title = common.SubStr(inputText, 20)
+	}
+	// 输入长度限制
+	inputLengthLimit := c.GetInt("input_length_limit")
+	if inputLengthLimit != 0 && utf8.RuneCountInString(inputText) > inputLengthLimit {
+		return service.OpenAIErrorWrapper(err, "您的问题超出长度限制", http.StatusForbidden)
+	}
+
+	// 有会话ID则存储会话消息
+	if imageRequest.ConversationID != "" {
+		messgae.Insert()
+		// 更新Coversation的标题
+		model.UpdateConversationTitle(imageRequest.ConversationID, title)
+		relayInfo.ConversationID = imageRequest.ConversationID
+		relayInfo.ExchangeID = messgae.ExchangeID
+	}
 
 	convertedRequest, err := adaptor.ConvertImageRequest(c, relayInfo, *imageRequest)
 	if err != nil {

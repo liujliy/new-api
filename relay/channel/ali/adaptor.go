@@ -3,7 +3,6 @@ package ali
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"one-api/dto"
@@ -11,6 +10,8 @@ import (
 	"one-api/relay/channel/openai"
 	relaycommon "one-api/relay/common"
 	"one-api/relay/constant"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Adaptor struct {
@@ -40,6 +41,9 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *rel
 	}
 	if c.GetString("plugin") != "" {
 		req.Set("X-DashScope-Plugin", c.GetString("plugin"))
+	}
+	if info.RelayMode == constant.RelayModeImagesGenerations {
+		req.Set("X-DashScope-Async", "enable")
 	}
 	return nil
 }
