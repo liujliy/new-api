@@ -7,3 +7,8 @@ type CreateMessageRequest struct {
 	Content        string
 	ContentType    string
 }
+
+type ClearMessageRequest struct {
+	ConversationID string `json:"conversation_id" binding:"required"`
+	ExchangeID     string `json:"exchange_id"`
+}

@@ -2,12 +2,13 @@ package controller
 
 import (
 	"net/http"
+	"one-api/dto"
 	"one-api/model"
 
 	"github.com/gin-gonic/gin"
 )
 
-// GetConversations 获取用户的所有会话
+// 获取用户的所有会话
 func GetConversations(c *gin.Context) {
 	userId := c.GetInt("id")
 	conversations, err := model.GetConversationsByUserID(userId)
@@ -25,7 +26,7 @@ func GetConversations(c *gin.Context) {
 	})
 }
 
-// CreateConversation 创建新的会话
+// 创建新的会话
 func CreateConversation(c *gin.Context) {
 	var conversation model.Conversation
 	if err := c.ShouldBindJSON(&conversation); err != nil {
@@ -48,5 +49,29 @@ func CreateConversation(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data":    conversationId,
+	})
+}
+
+// 删除会话
+func DeleteConversation(c *gin.Context) {
+	var deleteConversationRequest dto.DeleteConversationRequest
+	if err := c.ShouldBindJSON(&deleteConversationRequest); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	err := model.DeleteConversation(c.GetInt("id"), deleteConversationRequest.ConversationID)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
 	})
 }

@@ -33,6 +33,7 @@ func (m ModelConfig) Value() (driver.Value, error) {
 	return json.Marshal(m)
 }
 
+// 根据用户ID获取会话列表
 func GetConversationsByUserID(userID int) ([]*Conversation, error) {
 	var conversations []*Conversation
 	// 开始事务
@@ -59,7 +60,7 @@ func GetConversationsByUserID(userID int) ([]*Conversation, error) {
 	return conversations, nil
 }
 
-// CreateConversation 创建新的会话
+// 创建新的会话
 func (conversation *Conversation) Insert() (string, error) {
 	if conversation.Title == "" {
 		conversation.Title = "新对话"
@@ -71,6 +72,7 @@ func (conversation *Conversation) Insert() (string, error) {
 	return conversation.ID, err
 }
 
+// 更新会话标题
 func UpdateConversationTitle(conversationID string, title string) {
 	if title == "" {
 		return
@@ -88,4 +90,9 @@ func UpdateConversationTitle(conversationID string, title string) {
 	}
 	// 更新指定会话的标题
 	DB.Model(conversation).Update("title", title)
+}
+
+// 删除用户的会话
+func DeleteConversation(userID int, conversationID string) error {
+	return DB.Where("user_id = ? and id = ?", userID, conversationID).Delete(&Conversation{}).Error
 }

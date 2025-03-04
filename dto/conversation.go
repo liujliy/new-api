@@ -5,3 +5,7 @@ type CreateConversationRequest struct {
 	Model string `json:"model"`
 	// ModelConfig model.ModelConfig `json:"model_config"`
 }
+
+type DeleteConversationRequest struct {
+	ConversationID string `json:"conversation_id" binding:"required"`
+}

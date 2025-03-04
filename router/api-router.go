@@ -161,6 +161,13 @@ func SetApiRouter(router *gin.Engine) {
 			conversationRoute.GET("/list", controller.GetConversations)
 			conversationRoute.GET("/:conversation_id/messages", controller.GetMessages)
 			conversationRoute.POST("/create", controller.CreateConversation)
+			conversationRoute.POST("/delete", controller.DeleteConversation)
+			conversationRoute.POST("/clear/messages", controller.ClearMessages)
+		}
+		cosRoute := apiRouter.Group("/cos")
+		cosRoute.Use(middleware.UserAuth())
+		{
+			cosRoute.GET("/sts", controller.GetCosSTS)
 		}
 	}
 }
