@@ -191,7 +191,7 @@ func TextHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 		}
 	}
 	// 输入长度限制
-	inputLengthLimit := c.GetInt("input_length_limit")
+	inputLengthLimit := c.GetInt("user_input_length_limit")
 	if inputLengthLimit != 0 && utf8.RuneCountInString(inputText) > inputLengthLimit {
 		return service.OpenAIErrorWrapper(err, "您的问题超出长度限制", http.StatusForbidden)
 	}

@@ -52,6 +52,29 @@ func CreateConversation(c *gin.Context) {
 	})
 }
 
+func UpdateConversation(c *gin.Context) {
+	var conversation model.Conversation
+	if err := c.ShouldBindJSON(&conversation); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	err := conversation.Update()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+	})
+}
+
 // 删除会话
 func DeleteConversation(c *gin.Context) {
 	var deleteConversationRequest dto.DeleteConversationRequest

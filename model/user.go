@@ -7,6 +7,7 @@ import (
 	"one-api/common"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bytedance/gopkg/util/gopool"
 
@@ -40,6 +41,10 @@ type User struct {
 	DeletedAt        gorm.DeletedAt `gorm:"index"`
 	LinuxDOId        string         `json:"linux_do_id" gorm:"column:linux_do_id;index"`
 	Setting          string         `json:"setting" gorm:"type:text;column:setting"`
+	StartTimeLimit   *time.Time     `json:"start_time_limit"`
+	EndTimeLimit     *time.Time     `json:"end_time_limit"`
+	InputLengthLimit int            `json:"input_length_limit" gorm:"default:0"` // 0 means no limit
+	OutputImageLimit int            `json:"output_image_limit" gorm:"default:0"` // 0 means no limit
 }
 
 func (user *User) ToBaseUser() *UserBase {

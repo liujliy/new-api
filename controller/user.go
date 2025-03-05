@@ -705,12 +705,68 @@ func CreateUser(c *gin.Context) {
 		Password:    user.Password,
 		DisplayName: user.DisplayName,
 	}
+	exist, err := model.CheckUserExistOrDeleted(user.Username, user.Email)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "数据库错误，请稍后重试",
+		})
+		common.SysError(fmt.Sprintf("CheckUserExistOrDeleted error: %v", err))
+		return
+	}
+	if exist {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "用户名已存在，或已注销",
+		})
+		return
+	}
 	if err := cleanUser.Insert(0); err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": err.Error(),
 		})
 		return
+	}
+	// 获取插入后的用户ID
+	var insertedUser model.User
+	if err := model.DB.Where("username = ?", cleanUser.Username).First(&insertedUser).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "新增用户失败",
+		})
+		return
+	}
+	// 生成默认令牌
+	if constant.GenerateDefaultToken {
+		key, err := common.GenerateKey()
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "生成默认令牌失败",
+			})
+			common.SysError("failed to generate token key: " + err.Error())
+			return
+		}
+		// 生成默认令牌
+		token := model.Token{
+			UserId:             insertedUser.Id,
+			Name:               cleanUser.Username + "的初始令牌",
+			Key:                key,
+			CreatedTime:        common.GetTimestamp(),
+			AccessedTime:       common.GetTimestamp(),
+			ExpiredTime:        -1,     // 永不过期
+			RemainQuota:        500000, // 示例额度
+			UnlimitedQuota:     true,
+			ModelLimitsEnabled: false,
+		}
+		if err := token.Insert(); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "创建默认令牌失败",
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{

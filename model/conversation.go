@@ -72,6 +72,13 @@ func (conversation *Conversation) Insert() (string, error) {
 	return conversation.ID, err
 }
 
+// 更新会话
+func (conversation *Conversation) Update() error {
+	newConversation := *conversation
+	DB.First(&conversation, conversation.ID)
+	return DB.Model(conversation).Updates(newConversation).Error
+}
+
 // 更新会话标题
 func UpdateConversationTitle(conversationID string, title string) {
 	if title == "" {

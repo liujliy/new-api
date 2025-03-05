@@ -161,6 +161,7 @@ func SetApiRouter(router *gin.Engine) {
 			conversationRoute.GET("/list", controller.GetConversations)
 			conversationRoute.GET("/:conversation_id/messages", controller.GetMessages)
 			conversationRoute.POST("/create", controller.CreateConversation)
+			conversationRoute.POST("/update", controller.UpdateConversation)
 			conversationRoute.POST("/delete", controller.DeleteConversation)
 			conversationRoute.POST("/clear/messages", controller.ClearMessages)
 		}

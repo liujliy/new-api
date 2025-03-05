@@ -3,23 +3,28 @@ package model
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"one-api/common"
 	"one-api/constant"
 	"time"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/bytedance/gopkg/util/gopool"
 )
 
 // UserBase struct remains the same as it represents the cached data structure
 type UserBase struct {
-	Id       int    `json:"id"`
-	Group    string `json:"group"`
-	Email    string `json:"email"`
-	Quota    int    `json:"quota"`
-	Status   int    `json:"status"`
-	Username string `json:"username"`
-	Setting  string `json:"setting"`
+	Id               int        `json:"id"`
+	Group            string     `json:"group"`
+	Email            string     `json:"email"`
+	Quota            int        `json:"quota"`
+	Status           int        `json:"status"`
+	Username         string     `json:"username"`
+	Setting          string     `json:"setting"`
+	StartTimeLimit   *time.Time `json:"start_time_limit"`
+	EndTimeLimit     *time.Time `json:"end_time_limit"`
+	InputLengthLimit int        `json:"input_length_limit"`
+	OutputImageLimit int        `json:"output_image_limit"`
 }
 
 func (user *UserBase) WriteContext(c *gin.Context) {
@@ -29,6 +34,10 @@ func (user *UserBase) WriteContext(c *gin.Context) {
 	c.Set(constant.ContextKeyUserEmail, user.Email)
 	c.Set("username", user.Username)
 	c.Set(constant.ContextKeyUserSetting, user.GetSetting())
+	c.Set("user_start_time_limit", user.StartTimeLimit)
+	c.Set("user_end_time_limit", user.EndTimeLimit)
+	c.Set("user_input_length_limit", user.InputLengthLimit)
+	c.Set("user_output_image_limit", user.OutputImageLimit)
 }
 
 func (user *UserBase) GetSetting() map[string]interface{} {
@@ -103,13 +112,17 @@ func GetUserCache(userId int) (userCache *UserBase, err error) {
 
 	// Create cache object from user data
 	userCache = &UserBase{
-		Id:       user.Id,
-		Group:    user.Group,
-		Quota:    user.Quota,
-		Status:   user.Status,
-		Username: user.Username,
-		Setting:  user.Setting,
-		Email:    user.Email,
+		Id:               user.Id,
+		Group:            user.Group,
+		Quota:            user.Quota,
+		Status:           user.Status,
+		Username:         user.Username,
+		Setting:          user.Setting,
+		Email:            user.Email,
+		StartTimeLimit:   user.StartTimeLimit,
+		EndTimeLimit:     user.EndTimeLimit,
+		InputLengthLimit: user.InputLengthLimit,
+		OutputImageLimit: user.OutputImageLimit,
 	}
 
 	return userCache, nil

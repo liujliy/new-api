@@ -38,9 +38,9 @@ func Distribute() func(c *gin.Context) {
 		loc, _ := time.LoadLocation("Asia/Shanghai")
 		now := time.Now().In(loc)
 
-		startTimeLimit := c.GetTime("start_time_limit")
+		startTimeLimit := c.GetTime("user_start_time_limit")
 		startH, startM, _ := startTimeLimit.Clock()
-		endTimeLimit := c.GetTime("end_time_limit")
+		endTimeLimit := c.GetTime("user_end_time_limit")
 		endH, endM, _ := endTimeLimit.Clock()
 		// 构造时间对象
 		startTime := time.Date(now.Year(), now.Month(), now.Day(), startH, startM, 0, 0, loc)

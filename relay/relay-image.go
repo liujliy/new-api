@@ -36,6 +36,11 @@ func getAndValidImageRequest(c *gin.Context, info *relaycommon.RelayInfo) (*dto.
 	if imageRequest.N == 0 {
 		imageRequest.N = 1
 	}
+	// user limit output image
+	outputImageLimit := c.GetInt("user_output_image_limit")
+	if outputImageLimit != 0 && imageRequest.N > outputImageLimit {
+		return nil, errors.New("一次请求生成的图片数量超出限制")
+	}
 	if imageRequest.Size == "" {
 		imageRequest.Size = "1024x1024"
 	}
