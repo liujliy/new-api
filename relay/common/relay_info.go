@@ -12,27 +12,32 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type ThinkingContentInfo struct {
+	IsFirstThinkingContent  bool
+	SendLastThinkingContent bool
+}
+
 type RelayInfo struct {
-	ConversationID            string
-	ExchangeID                string
-	ChannelType               int
-	ChannelId                 int
-	TokenId                   int
-	TokenKey                  string
-	UserId                    int
-	Group                     string
-	TokenUnlimited            bool
-	StartTime                 time.Time
-	FirstResponseTime         time.Time
-	IsFirstResponse           bool
-	SendLastReasoningResponse bool
-	ApiType                   int
-	IsStream                  bool
-	IsPlayground              bool
-	UsePrice                  bool
-	RelayMode                 int
-	UpstreamModelName         string
-	OriginModelName           string
+	ConversationID    string
+	ExchangeID        string
+	ChannelType       int
+	ChannelId         int
+	TokenId           int
+	TokenKey          string
+	UserId            int
+	Group             string
+	TokenUnlimited    bool
+	StartTime         time.Time
+	FirstResponseTime time.Time
+	isFirstResponse   bool
+	//SendLastReasoningResponse bool
+	ApiType           int
+	IsStream          bool
+	IsPlayground      bool
+	UsePrice          bool
+	RelayMode         int
+	UpstreamModelName string
+	OriginModelName   string
 	//RecodeModelName      string
 	RequestURLPath       string
 	ApiVersion           string
@@ -56,6 +61,7 @@ type RelayInfo struct {
 	UserEmail            string
 	UserQuota            int
 	OutputImageInfo      string
+	ThinkingContentInfo
 }
 
 // 定义支持流式选项的通道类型
@@ -98,7 +104,7 @@ func GenRelayInfo(c *gin.Context) *RelayInfo {
 		UserQuota:         c.GetInt(constant.ContextKeyUserQuota),
 		UserSetting:       c.GetStringMap(constant.ContextKeyUserSetting),
 		UserEmail:         c.GetString(constant.ContextKeyUserEmail),
-		IsFirstResponse:   true,
+		isFirstResponse:   true,
 		RelayMode:         relayconstant.Path2RelayMode(c.Request.URL.Path),
 		BaseUrl:           c.GetString("base_url"),
 		RequestURLPath:    c.Request.URL.String(),
@@ -120,6 +126,10 @@ func GenRelayInfo(c *gin.Context) *RelayInfo {
 		ApiKey:         strings.TrimPrefix(c.Request.Header.Get("Authorization"), "Bearer "),
 		Organization:   c.GetString("channel_organization"),
 		ChannelSetting: channelSetting,
+		ThinkingContentInfo: ThinkingContentInfo{
+			IsFirstThinkingContent:  true,
+			SendLastThinkingContent: false,
+		},
 	}
 	if strings.HasPrefix(c.Request.URL.Path, "/pg") {
 		info.IsPlayground = true
@@ -150,9 +160,9 @@ func (info *RelayInfo) SetIsStream(isStream bool) {
 }
 
 func (info *RelayInfo) SetFirstResponseTime() {
-	if info.IsFirstResponse {
+	if info.isFirstResponse {
 		info.FirstResponseTime = time.Now()
-		info.IsFirstResponse = false
+		info.isFirstResponse = false
 	}
 }
 

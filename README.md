@@ -77,7 +77,7 @@
 
 ## 模型支持
 此版本额外支持以下模型：
-1. 第三方模型 **gps** （gpt-4-gizmo-*）
+1. 第三方模型 **gpts** （gpt-4-gizmo-*）
 2. [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy)接口，[对接文档](Midjourney.md)
 3. 自定义渠道，支持填入完整调用地址
 4. [Suno API](https://github.com/Suno-API/Suno-API) 接口，[对接文档](Suno.md)
@@ -177,7 +177,7 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtow
 
 ## 渠道重试
 渠道重试功能已经实现，可以在`设置->运营设置->通用设置`设置重试次数，**建议开启缓存**功能。  
-如果开启了重试功能，第一次重试使用同优先级，第二次重试使用下一个优先级，以此类推。
+如果开启了重试功能，重试使用下一个优先级，以此类推。
 ### 缓存设置方法
 1. `REDIS_CONN_STRING`：设置之后将使用 Redis 作为缓存使用。
     + 例子：`REDIS_CONN_STRING=redis://default:redispw@localhost:49153`
@@ -220,8 +220,8 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtow
 - [neko-api-key-tool](https://github.com/Calcium-Ion/neko-api-key-tool)：用key查询使用额度
 
 其他基于New API的项目：
-- [new-api-horizon](https://github.com/Calcium-Ion/new-api-horizon)：New API高性能优化版，并支持Claude格式
-- [VoAPI](https://github.com/VoAPI/VoAPI)：基于New API的闭源项目
+- [new-api-horizon](https://github.com/Calcium-Ion/new-api-horizon)：New API高性能优化版，专注于高并发优化，并支持Claude格式
+- [VoAPI](https://github.com/VoAPI/VoAPI)：基于New API的前端美化版本，闭源免费
 
 ## 🌟 Star History
 
