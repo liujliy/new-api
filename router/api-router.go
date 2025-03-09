@@ -170,5 +170,10 @@ func SetApiRouter(router *gin.Engine) {
 		{
 			cosRoute.GET("/sts", controller.GetCosSTS)
 		}
+		volcRoute := apiRouter.Group("/volc")
+		volcRoute.Use(middleware.UserAuth())
+		{
+			volcRoute.POST("/proxy", controller.ProxyAIGC)
+		}
 	}
 }
