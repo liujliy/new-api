@@ -464,7 +464,4 @@ func postConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo,
 		}
 		message.Insert()
 	}
-	//if quota != 0 {
-	//
-	//}
 }
