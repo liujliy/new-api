@@ -27,6 +27,7 @@ require (
 	github.com/pkoukk/tiktoken-go v0.1.7
 	github.com/samber/lo v1.39.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
+	github.com/shopspring/decimal v1.4.0
 	github.com/tencentyun/qcloud-cos-sts-sdk v0.0.0-20241118064430-63a76784514f
 	github.com/volcengine/volc-sdk-golang v1.0.198
 	golang.org/x/crypto v0.27.0
