@@ -174,6 +174,7 @@ func SetApiRouter(router *gin.Engine) {
 		volcRoute.Use(middleware.UserAuth())
 		{
 			volcRoute.POST("/proxy", controller.ProxyAIGC)
+			volcRoute.GET("/rtc/token", controller.GetRTCToken)
 		}
 	}
 }

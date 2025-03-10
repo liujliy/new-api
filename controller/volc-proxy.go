@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"one-api/common"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/volcengine/volc-sdk-golang/base"
@@ -82,5 +84,35 @@ func ProxyAIGC(c *gin.Context) {
 		"message": "",
 		"success": true,
 		"data":    result,
+	})
+}
+
+func GetRTCToken(c *gin.Context) {
+	roomID := c.Query("room_id")
+	userID := c.Query("user_id")
+
+	token := common.NewRTCToken(
+		os.Getenv("VOLC_ACCESSKEY"),
+		os.Getenv("VOLC_SECRETKEY"),
+		roomID,
+		userID,
+	)
+	token.ExpireTime(time.Now().Add(time.Hour * 24))
+	token.AddPrivilege(common.PrivSubscribeStream, time.Time{})
+	token.AddPrivilege(common.PrivPublishStream, time.Now().Add(time.Minute))
+
+	tokenStr, err := token.Serialize()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": err.Error(),
+			"success": false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "",
+		"success": true,
+		"data":    tokenStr,
 	})
 }
