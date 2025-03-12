@@ -161,15 +161,6 @@ func ImageHelper(c *gin.Context) *dto.OpenAIErrorWithStatusCode {
 		return service.OpenAIErrorWrapper(err, "您的问题超出长度限制", http.StatusForbidden)
 	}
 
-	// 有会话ID则存储会话消息
-	if imageRequest.ConversationID != "" {
-		messgae.Insert()
-		// 更新Coversation的标题
-		model.UpdateConversationTitle(imageRequest.ConversationID, title)
-		relayInfo.ConversationID = imageRequest.ConversationID
-		relayInfo.ExchangeID = messgae.ExchangeID
-	}
-
 	convertedRequest, err := adaptor.ConvertImageRequest(c, relayInfo, *imageRequest)
 	if err != nil {
 		return service.OpenAIErrorWrapperLocal(err, "convert_request_failed", http.StatusInternalServerError)
@@ -183,8 +174,18 @@ func ImageHelper(c *gin.Context) *dto.OpenAIErrorWithStatusCode {
 
 	statusCodeMappingStr := c.GetString("status_code_mapping")
 
+	// 有会话ID则存储会话消息
+	if imageRequest.ConversationID != "" {
+		messgae.Insert()
+		// 更新Coversation的标题
+		model.UpdateConversationTitle(imageRequest.ConversationID, title)
+		relayInfo.ConversationID = imageRequest.ConversationID
+		relayInfo.ExchangeID = messgae.ExchangeID
+	}
+
 	resp, err := adaptor.DoRequest(c, relayInfo, requestBody)
 	if err != nil {
+		addErrorMessage(relayInfo.ConversationID, relayInfo.ExchangeID, err.Error(), "error")
 		return service.OpenAIErrorWrapper(err, "do_request_failed", http.StatusInternalServerError)
 	}
 	var httpResp *http.Response
@@ -195,6 +196,7 @@ func ImageHelper(c *gin.Context) *dto.OpenAIErrorWithStatusCode {
 			openaiErr := service.RelayErrorHandler(httpResp, false)
 			// reset status code 重置状态码
 			service.ResetStatusCode(openaiErr, statusCodeMappingStr)
+			addErrorMessage(relayInfo.ConversationID, relayInfo.ExchangeID, openaiErr.Error.Message, "error")
 			return openaiErr
 		}
 	}
@@ -203,6 +205,7 @@ func ImageHelper(c *gin.Context) *dto.OpenAIErrorWithStatusCode {
 	if openaiErr != nil {
 		// reset status code 重置状态码
 		service.ResetStatusCode(openaiErr, statusCodeMappingStr)
+		addErrorMessage(relayInfo.ConversationID, relayInfo.ExchangeID, openaiErr.Error.Message, "error")
 		return openaiErr
 	}
 

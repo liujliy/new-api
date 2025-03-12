@@ -199,15 +199,6 @@ func TextHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 		return service.OpenAIErrorWrapper(err, "您的问题超出长度限制", http.StatusForbidden)
 	}
 
-	// 有会话ID则存储会话消息
-	if textRequest.ConversationID != "" {
-		messgae.Insert()
-		// 更新Coversation的标题
-		model.UpdateConversationTitle(textRequest.ConversationID, title)
-		relayInfo.ConversationID = textRequest.ConversationID
-		relayInfo.ExchangeID = messgae.ExchangeID
-	}
-
 	if model_setting.GetGlobalSettings().PassThroughRequestEnabled {
 		body, err := common.GetRequestBody(c)
 		if err != nil {
@@ -225,10 +216,19 @@ func TextHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 		}
 		requestBody = bytes.NewBuffer(jsonData)
 	}
+	// 有会话ID则存储会话消息
+	if textRequest.ConversationID != "" {
+		messgae.Insert()
+		// 更新Coversation的标题
+		model.UpdateConversationTitle(textRequest.ConversationID, title)
+		relayInfo.ConversationID = textRequest.ConversationID
+		relayInfo.ExchangeID = messgae.ExchangeID
+	}
 
 	var httpResp *http.Response
 	resp, err := adaptor.DoRequest(c, relayInfo, requestBody)
 	if err != nil {
+		addErrorMessage(relayInfo.ConversationID, relayInfo.ExchangeID, err.Error(), "error")
 		return service.OpenAIErrorWrapper(err, "do_request_failed", http.StatusInternalServerError)
 	}
 
@@ -241,6 +241,8 @@ func TextHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 			openaiErr = service.RelayErrorHandler(httpResp, false)
 			// reset status code 重置状态码
 			service.ResetStatusCode(openaiErr, statusCodeMappingStr)
+			// 添加错误记录消息
+			addErrorMessage(relayInfo.ConversationID, relayInfo.ExchangeID, openaiErr.Error.Message, "error")
 			return openaiErr
 		}
 	}
@@ -249,6 +251,8 @@ func TextHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 	if openaiErr != nil {
 		// reset status code 重置状态码
 		service.ResetStatusCode(openaiErr, statusCodeMappingStr)
+		// 添加错误记录消息
+		addErrorMessage(relayInfo.ConversationID, relayInfo.ExchangeID, openaiErr.Error.Message, "error")
 		return openaiErr
 	}
 
@@ -465,13 +469,20 @@ func postConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo,
 			contentType = "text"
 			content = ""
 		}
-		message := model.Message{
-			ConversationID: relayInfo.ConversationID,
-			ExchangeID:     relayInfo.ExchangeID,
-			Role:           "assistant",
-			Content:        content,
-			ContentType:    contentType,
-		}
-		message.Insert()
+		addErrorMessage(relayInfo.ConversationID, relayInfo.ExchangeID, content, contentType)
 	}
+}
+
+func addErrorMessage(conversationID, exchangeID, content, contentType string) {
+	if conversationID == "" {
+		return
+	}
+	message := model.Message{
+		ConversationID: conversationID,
+		ExchangeID:     exchangeID,
+		Role:           "assistant",
+		Content:        content,
+		ContentType:    contentType,
+	}
+	message.Insert()
 }
