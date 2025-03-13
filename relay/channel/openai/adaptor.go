@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -22,6 +21,8 @@ import (
 	relaycommon "one-api/relay/common"
 	"one-api/relay/constant"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Adaptor struct {
@@ -214,6 +215,11 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 	return request, nil
 }
 
+func (a *Adaptor) ConvertFileRequest(c *gin.Context, info *relaycommon.RelayInfo) (io.Reader, error) {
+	//TODO implement me
+	return nil, errors.New("not implemented")
+}
+
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
 	if info.RelayMode == constant.RelayModeAudioTranscription || info.RelayMode == constant.RelayModeAudioTranslation {
 		return channel.DoFormRequest(a, c, info, requestBody)
@@ -238,6 +244,8 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycom
 		err, usage = OpenaiTTSHandler(c, resp, info)
 	case constant.RelayModeRerank:
 		err, usage = jina.JinaRerankHandler(c, resp)
+	case constant.RelayModeFile:
+		err, usage = OpenaiFileHandler(c, resp, info)
 	default:
 		if info.IsStream {
 			err, usage = OaiStreamHandler(c, resp, info)

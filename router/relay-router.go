@@ -1,10 +1,11 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"one-api/controller"
 	"one-api/middleware"
 	"one-api/relay"
+
+	"github.com/gin-gonic/gin"
 )
 
 func SetRelayRouter(router *gin.Engine) {
@@ -48,7 +49,7 @@ func SetRelayRouter(router *gin.Engine) {
 		httpRouter.POST("/audio/translations", controller.Relay)
 		httpRouter.POST("/audio/speech", controller.Relay)
 		httpRouter.GET("/files", controller.RelayNotImplemented)
-		httpRouter.POST("/files", controller.RelayNotImplemented)
+		httpRouter.POST("/files", controller.Relay)
 		httpRouter.DELETE("/files/:id", controller.RelayNotImplemented)
 		httpRouter.GET("/files/:id", controller.RelayNotImplemented)
 		httpRouter.GET("/files/:id/content", controller.RelayNotImplemented)

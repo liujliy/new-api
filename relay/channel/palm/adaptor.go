@@ -3,13 +3,14 @@ package palm
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"one-api/dto"
 	"one-api/relay/channel"
 	relaycommon "one-api/relay/common"
 	"one-api/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Adaptor struct {
@@ -27,6 +28,11 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
+	//TODO implement me
+	return nil, errors.New("not implemented")
+}
+
+func (a *Adaptor) ConvertFileRequest(c *gin.Context, info *relaycommon.RelayInfo) (io.Reader, error) {
 	//TODO implement me
 	return nil, errors.New("not implemented")
 }

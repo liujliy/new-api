@@ -37,6 +37,8 @@ func relayHandler(c *gin.Context, relayMode int) *dto.OpenAIErrorWithStatusCode 
 		err = relay.RerankHelper(c, relayMode)
 	case relayconstant.RelayModeEmbeddings:
 		err = relay.EmbeddingHelper(c)
+	case relayconstant.RelayModeFile:
+		err = relay.FileHelper(c)
 	default:
 		err = relay.TextHelper(c)
 	}

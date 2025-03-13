@@ -112,6 +112,7 @@ type MediaContent struct {
 	Text       string `json:"text,omitempty"`
 	ImageUrl   any    `json:"image_url,omitempty"`
 	InputAudio any    `json:"input_audio,omitempty"`
+	FileInfo   any    `json:"file_info,omitempty"`
 }
 
 type MessageImageUrl struct {
@@ -124,10 +125,16 @@ type MessageInputAudio struct {
 	Format string `json:"format"`
 }
 
+type MessageFileInfo struct {
+	FileId   string `json:"file_id"`
+	FileName string `json:"file_name"`
+}
+
 const (
 	ContentTypeText       = "text"
 	ContentTypeImageURL   = "image_url"
 	ContentTypeInputAudio = "input_audio"
+	ContentTypeFileInfo   = "file_info"
 )
 
 func (m *Message) GetPrefix() bool {
@@ -281,6 +288,21 @@ func (m *Message) ParseContent() []MediaContent {
 							InputAudio: MessageInputAudio{
 								Data:   data,
 								Format: format,
+							},
+						})
+					}
+				}
+
+			case ContentTypeFileInfo:
+				if fileInfo, ok := contentItem["file_info"].(map[string]interface{}); ok {
+					fileId, ok1 := fileInfo["file_id"].(string)
+					fileName, ok2 := fileInfo["file_name"].(string)
+					if ok1 && ok2 {
+						contentList = append(contentList, MediaContent{
+							Type: ContentTypeFileInfo,
+							FileInfo: MessageFileInfo{
+								FileId:   fileId,
+								FileName: fileName,
 							},
 						})
 					}

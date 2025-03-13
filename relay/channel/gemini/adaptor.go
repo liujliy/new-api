@@ -65,6 +65,11 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 	return geminiRequest, nil
 }
 
+func (a *Adaptor) ConvertFileRequest(c *gin.Context, info *relaycommon.RelayInfo) (io.Reader, error) {
+	//TODO implement me
+	return nil, errors.New("not implemented")
+}
+
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
 
 }

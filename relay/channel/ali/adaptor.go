@@ -1,9 +1,11 @@
 package ali
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"one-api/dto"
 	"one-api/relay/channel"
@@ -33,6 +35,8 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 		fullRequestURL = fmt.Sprintf("%s/api/v1/services/embeddings/text-embedding/text-embedding", info.BaseUrl)
 	case constant.RelayModeImagesGenerations:
 		fullRequestURL = fmt.Sprintf("%s/api/v1/services/aigc/text2image/image-synthesis", info.BaseUrl)
+	case constant.RelayModeFile:
+		fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/files", info.BaseUrl)
 	default:
 		fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/chat/completions", info.BaseUrl)
 	}
@@ -58,6 +62,9 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, info *relaycommon.RelayInfo, re
 	if request == nil {
 		return nil, errors.New("request is nil")
 	}
+	// 处理文本对话的请求
+	fileMsg2Ai(request)
+
 	switch info.RelayMode {
 	default:
 		aliReq := requestOpenAI2Ali(*request)
@@ -83,7 +90,51 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 	return nil, errors.New("not implemented")
 }
 
+func (a *Adaptor) ConvertFileRequest(c *gin.Context, info *relaycommon.RelayInfo) (io.Reader, error) {
+	if c.Request.Method == http.MethodGet {
+		return nil, nil
+	}
+	var requestBody bytes.Buffer
+	writer := multipart.NewWriter(&requestBody)
+
+	// 获取所有表单字段
+	formData := c.Request.PostForm
+
+	// 遍历表单字段并打印输出
+	for key, values := range formData {
+		if key == "model" {
+			continue
+		}
+		for _, value := range values {
+			writer.WriteField(key, value)
+		}
+	}
+
+	// 添加文件字段
+	file, header, err := c.Request.FormFile("file")
+	if err != nil {
+		return nil, errors.New("file is required")
+	}
+	defer file.Close()
+
+	part, err := writer.CreateFormFile("file", header.Filename)
+	if err != nil {
+		return nil, errors.New("create form file failed")
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		return nil, errors.New("copy file failed")
+	}
+
+	// 关闭 multipart 编写器以设置分界线
+	writer.Close()
+	c.Request.Header.Set("Content-Type", writer.FormDataContentType())
+	return &requestBody, nil
+}
+
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
+	if info.RelayMode == constant.RelayModeFile {
+		return channel.DoFormRequest(a, c, info, requestBody)
+	}
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
@@ -93,6 +144,8 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycom
 		err, usage = aliImageHandler(c, resp, info)
 	case constant.RelayModeEmbeddings:
 		err, usage = aliEmbeddingHandler(c, resp)
+	case constant.RelayModeFile:
+		err, usage = openai.OpenaiFileHandler(c, resp, info)
 	default:
 		if info.IsStream {
 			err, usage = openai.OaiStreamHandler(c, resp, info)
