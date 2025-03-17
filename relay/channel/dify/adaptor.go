@@ -8,7 +8,6 @@ import (
 	"one-api/dto"
 	"one-api/relay/channel"
 	relaycommon "one-api/relay/common"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,15 +45,16 @@ func (a *Adaptor) ConvertFileRequest(c *gin.Context, info *relaycommon.RelayInfo
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo) {
-	if strings.HasPrefix(info.UpstreamModelName, "agent") {
-		a.BotType = BotTypeAgent
-	} else if strings.HasPrefix(info.UpstreamModelName, "workflow") {
-		a.BotType = BotTypeWorkFlow
-	} else if strings.HasPrefix(info.UpstreamModelName, "chat") {
-		a.BotType = BotTypeCompletion
-	} else {
-		a.BotType = BotTypeChatFlow
-	}
+	//if strings.HasPrefix(info.UpstreamModelName, "agent") {
+	//	a.BotType = BotTypeAgent
+	//} else if strings.HasPrefix(info.UpstreamModelName, "workflow") {
+	//	a.BotType = BotTypeWorkFlow
+	//} else if strings.HasPrefix(info.UpstreamModelName, "chat") {
+	//	a.BotType = BotTypeCompletion
+	//} else {
+	//}
+	a.BotType = BotTypeChatFlow
+
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
@@ -76,11 +76,11 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *rel
 	return nil
 }
 
-func (a *Adaptor) ConvertRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
+func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayInfo, request *dto.GeneralOpenAIRequest) (any, error) {
 	if request == nil {
 		return nil, errors.New("request is nil")
 	}
-	return requestOpenAI2Dify(*request), nil
+	return requestOpenAI2Dify(c, info, *request), nil
 }
 
 func (a *Adaptor) ConvertRerankRequest(c *gin.Context, relayMode int, request dto.RerankRequest) (any, error) {
