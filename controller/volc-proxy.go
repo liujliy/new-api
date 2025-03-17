@@ -92,8 +92,8 @@ func GetRTCToken(c *gin.Context) {
 	userID := c.Query("user_id")
 
 	token := common.NewRTCToken(
-		os.Getenv("VOLC_ACCESSKEY"),
-		os.Getenv("VOLC_SECRETKEY"),
+		os.Getenv("VOLC_APP_ID"),
+		os.Getenv("VOLC_APP_KEY"),
 		roomID,
 		userID,
 	)
