@@ -223,7 +223,7 @@ const EditUser = (props) => {
               </Space>
             </>
           )}
-          <Divider style={{ marginTop: 20 }}>{t('以下信息不可修改')}</Divider>
+          {/* <Divider style={{ marginTop: 20 }}>{t('以下信息不可修改')}</Divider>
           <div style={{ marginTop: 20 }}>
             <Typography.Text>{t('已绑定的 GitHub 账户')}</Typography.Text>
           </div>
@@ -272,7 +272,7 @@ const EditUser = (props) => {
             autoComplete='new-password'
             placeholder={t('此项只读，需要用户通过个人设置页面的相关绑定按钮进行绑定，不可直接修改')}
             readonly
-          />
+          /> */}
         </Spin>
       </SideSheet>
       <Modal

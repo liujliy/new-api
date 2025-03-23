@@ -329,7 +329,8 @@ const HeaderBar = () => {
                 </div>
               ),
             }}
-            items={buttons}
+            //隐藏头部栏
+            // items={buttons}
             footer={
               <>
                 {isNewYear && (

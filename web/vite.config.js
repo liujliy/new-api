@@ -54,13 +54,17 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
+      "/api": {
+        target: "https://www.qiansuoda.com/ai-admin/api/", // 目标服务器地址
+        changeOrigin: true, // 允许跨域
+        rewrite: (path) => path.replace(/^\/api/, ""), // 重写请求路径
+
       },
-      '/pg': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
+      "/pg": {
+        target: "https://www.qiansuoda.com/ai-admin/pg/", // 目标服务器地址
+        changeOrigin: true, // 允许跨域
+        rewrite: (path) => path.replace(/^\/v1/, ""),
+
       },
     },
   },

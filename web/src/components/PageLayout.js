@@ -2,7 +2,6 @@ import HeaderBar from './HeaderBar.js';
 import { Layout } from '@douyinfe/semi-ui';
 import SiderBar from './SiderBar.js';
 import App from '../App.js';
-import FooterBar from './Footer.js';
 import { ToastContainer } from 'react-toastify';
 import React, { useContext, useEffect } from 'react';
 import { StyleContext } from '../context/Style/index.js';
@@ -130,12 +129,7 @@ const PageLayout = () => {
           >
             <App />
           </Content>
-          <Layout.Footer style={{ 
-            flex: '0 0 auto',
-            width: '100%'
-          }}>
-            <FooterBar />
-          </Layout.Footer>
+         
         </Layout>
       </Layout>
       <ToastContainer />
