@@ -16,7 +16,7 @@ func CheckSensitiveMessages(messages []dto.Message) ([]string, error) {
 	for _, message := range messages {
 		arrayContent := message.ParseContent()
 		for _, m := range arrayContent {
-			if m.Type == "image_url" {
+			if m.Type == "image_url" || m.Type == "input_audio" || m.Type == "video_url" || m.Type == "file_info" {
 				// TODO: check image url
 				continue
 			}

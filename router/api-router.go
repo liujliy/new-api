@@ -160,6 +160,7 @@ func SetApiRouter(router *gin.Engine) {
 		conversationRoute.Use(middleware.UserAuth())
 		{
 			conversationRoute.GET("/list", controller.GetConversations)
+			conversationRoute.GET("/list_all", controller.ListConversations)
 			conversationRoute.GET("/:conversation_id/messages", controller.GetMessages)
 			conversationRoute.POST("/create", controller.CreateConversation)
 			conversationRoute.POST("/update", controller.UpdateConversation)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/dto"
+	"one-api/model"
 	relaycommon "one-api/relay/common"
 	"one-api/service"
 
@@ -48,6 +49,15 @@ func FileHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 		service.ResetStatusCode(openaiErr, statusCodeMappingStr)
 		return openaiErr
 	}
+	// 保存用户上传的文件
+	// TODO: 需要解析上传的文件信息
+	file := &model.File{
+		UserID:      relayInfo.UserId,
+		Username:    c.GetString("username"),
+		ChannelId:   relayInfo.ChannelId,
+		ChannelName: c.GetString("channel_name"),
+	}
+	file.Insert()
 
 	return nil
 }
