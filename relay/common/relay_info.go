@@ -85,6 +85,7 @@ type RelayInfo struct {
 	RelayFormat          string
 	SendResponseCount    int
 	OutputImageInfo      string
+	FileID               string
 	ThinkingContentInfo
 	ClaudeConvertInfo
 	*RerankerInfo

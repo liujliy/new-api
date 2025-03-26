@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/dto"
-	"one-api/model"
 	relaycommon "one-api/relay/common"
 	"one-api/service"
 
@@ -13,7 +12,10 @@ import (
 
 func FileHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 	relayInfo := relaycommon.GenRelayInfo(c)
-
+	// 设置file_id
+	if c.Request.Method == http.MethodGet {
+		relayInfo.FileID = c.Param("id")
+	}
 	adaptor := GetAdaptor(relayInfo.ApiType)
 	if adaptor == nil {
 		return service.OpenAIErrorWrapperLocal(fmt.Errorf("invalid api type: %d", relayInfo.ApiType), "invalid_api_type", http.StatusBadRequest)
@@ -51,13 +53,13 @@ func FileHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 	}
 	// 保存用户上传的文件
 	// TODO: 需要解析上传的文件信息
-	file := &model.File{
-		UserID:      relayInfo.UserId,
-		Username:    c.GetString("username"),
-		ChannelId:   relayInfo.ChannelId,
-		ChannelName: c.GetString("channel_name"),
-	}
-	file.Insert()
+	// file := &model.File{
+	// 	UserID:      relayInfo.UserId,
+	// 	Username:    c.GetString("username"),
+	// 	ChannelId:   relayInfo.ChannelId,
+	// 	ChannelName: c.GetString("channel_name"),
+	// }
+	// file.Insert()
 
 	return nil
 }

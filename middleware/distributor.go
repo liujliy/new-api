@@ -219,7 +219,11 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 		c.Set("relay_mode", relayMode)
 	}
 	if strings.HasPrefix(c.Request.URL.Path, "/v1/files") {
-		modelRequest.Model = c.PostForm("model")
+		if c.Request.Method == http.MethodGet {
+			modelRequest.Model = c.Query("model")
+		} else {
+			modelRequest.Model = c.PostForm("model")
+		}
 	}
 	return &modelRequest, shouldSelectChannel, nil
 }
