@@ -55,6 +55,24 @@ func (token *Token) GetIpLimitsMap() map[string]any {
 	return ipLimitsMap
 }
 
+func ListTokens(userId int, keyword string, token string, startIdx int, num int) ([]*Token, error) {
+	var tokens []*Token
+	var err error
+	query := DB.Model(&Token{})
+	if userId != 0 {
+		query = query.Where("user_id = ?", userId)
+	}
+	if keyword != "" {
+		query = query.Where("name LIKE ?", "%"+keyword+"%")
+	}
+	if token != "" {
+		token = strings.Trim(token, "sk-")
+		query = query.Where(keyCol+" LIKE ?", "%"+token+"%")
+	}
+	err = query.Order("id desc").Limit(num).Offset(startIdx).Find(&tokens).Error
+	return tokens, err
+}
+
 func GetAllUserTokens(userId int, startIdx int, num int) ([]*Token, error) {
 	var tokens []*Token
 	var err error

@@ -41,21 +41,29 @@ type User struct {
 	DeletedAt        gorm.DeletedAt `gorm:"index"`
 	LinuxDOId        string         `json:"linux_do_id" gorm:"column:linux_do_id;index"`
 	Setting          string         `json:"setting" gorm:"type:text;column:setting"`
-	StartTimeLimit   *time.Time     `json:"start_time_limit"`
-	EndTimeLimit     *time.Time     `json:"end_time_limit"`
+	StartTimeLimit   *time.Time     `json:"start_time_limit" gorm:"type:datetime;column:start_time_limit"`
+	EndTimeLimit     *time.Time     `json:"end_time_limit" gorm:"type:datetime;column:end_time_limit"`
 	InputLengthLimit int            `json:"input_length_limit" gorm:"default:0"` // 0 means no limit
 	OutputImageLimit int            `json:"output_image_limit" gorm:"default:0"` // 0 means no limit
 }
 
 func (user *User) ToBaseUser() *UserBase {
 	cache := &UserBase{
-		Id:       user.Id,
-		Group:    user.Group,
-		Quota:    user.Quota,
-		Status:   user.Status,
-		Username: user.Username,
-		Setting:  user.Setting,
-		Email:    user.Email,
+		Id:               user.Id,
+		Group:            user.Group,
+		Quota:            user.Quota,
+		Status:           user.Status,
+		Username:         user.Username,
+		Setting:          user.Setting,
+		Email:            user.Email,
+		InputLengthLimit: user.InputLengthLimit,
+		OutputImageLimit: user.OutputImageLimit,
+	}
+	if user.StartTimeLimit != nil {
+		cache.StartTimeLimit = user.StartTimeLimit.Unix()
+	}
+	if user.EndTimeLimit != nil {
+		cache.EndTimeLimit = user.EndTimeLimit.Unix()
 	}
 	return cache
 }
@@ -366,10 +374,14 @@ func (user *User) Edit(updatePassword bool) error {
 
 	newUser := *user
 	updates := map[string]interface{}{
-		"username":     newUser.Username,
-		"display_name": newUser.DisplayName,
-		"group":        newUser.Group,
-		"quota":        newUser.Quota,
+		"username":           newUser.Username,
+		"display_name":       newUser.DisplayName,
+		"group":              newUser.Group,
+		"quota":              newUser.Quota,
+		"start_time_limit":   newUser.StartTimeLimit,
+		"end_time_limit":     newUser.EndTimeLimit,
+		"input_length_limit": newUser.InputLengthLimit,
+		"output_image_limit": newUser.OutputImageLimit,
 	}
 	if updatePassword {
 		updates["password"] = newUser.Password

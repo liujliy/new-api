@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"one-api/constant"
 
@@ -700,10 +701,17 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	// Even for admin users, we cannot fully trust them!
+	// 默认使用时长限制 08:00-17:00
+	now := time.Now()
+	startTimeLimit := time.Date(now.Year(), now.Month(), now.Day(), 8, 0, 0, 0, time.Local)
+	endTimeLimit := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 0, time.Local)
 	cleanUser := model.User{
-		Username:    user.Username,
-		Password:    user.Password,
-		DisplayName: user.DisplayName,
+		Username:         user.Username,
+		Password:         user.Password,
+		DisplayName:      user.DisplayName,
+		StartTimeLimit:   &startTimeLimit,
+		EndTimeLimit:     &endTimeLimit,
+		InputLengthLimit: 2000,
 	}
 	exist, err := model.CheckUserExistOrDeleted(user.Username, user.Email)
 	if err != nil {
