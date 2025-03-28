@@ -117,6 +117,7 @@ func OaiStreamHandler(c *gin.Context, resp *http.Response, info *relaycommon.Rel
 	model := info.UpstreamModelName
 
 	var responseTextBuilder strings.Builder
+	var thinkingContentBuilder strings.Builder
 	var usage = &dto.Usage{}
 	var streamItems []string // store stream items
 	var forceFormat bool
@@ -175,12 +176,18 @@ func OaiStreamHandler(c *gin.Context, resp *http.Response, info *relaycommon.Rel
 	}
 
 	// 处理token计算
-	if err := processTokens(info.RelayMode, streamItems, &responseTextBuilder, &toolCount); err != nil {
+	if err := processTokens(info.RelayMode, streamItems, &responseTextBuilder, &thinkingContentBuilder, &toolCount); err != nil {
 		common.SysError("error processing tokens: " + err.Error())
+	}
+	var content string
+	if thinkingContentBuilder.Len() > 0 {
+		content = "<think>\n" + thinkingContentBuilder.String() + "\n</think>\n" + responseTextBuilder.String()
+	} else {
+		content = responseTextBuilder.String()
 	}
 
 	if !containStreamUsage {
-		usage, _ = service.ResponseText2Usage(responseTextBuilder.String(), info.UpstreamModelName, info.PromptTokens)
+		usage, _ = service.ResponseText2Usage(content, info.UpstreamModelName, info.PromptTokens)
 		usage.CompletionTokens += toolCount * 7
 	} else {
 		if info.ChannelType == common.ChannelTypeDeepSeek {
@@ -189,7 +196,7 @@ func OaiStreamHandler(c *gin.Context, resp *http.Response, info *relaycommon.Rel
 			}
 		}
 	}
-	usage.Content = responseTextBuilder.String()
+	usage.Content = content
 
 	handleFinalResponse(c, info, lastStreamData, responseId, createAt, model, systemFingerprint, usage, containStreamUsage)
 
@@ -245,6 +252,7 @@ func OpenaiHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayI
 		common.SysError("error copying response body: " + err.Error())
 	}
 	resp.Body.Close()
+
 	if simpleResponse.Usage.TotalTokens == 0 || (simpleResponse.Usage.PromptTokens == 0 && simpleResponse.Usage.CompletionTokens == 0) {
 		completionTokens := 0
 		for _, choice := range simpleResponse.Choices {
@@ -257,6 +265,16 @@ func OpenaiHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayI
 			TotalTokens:      info.PromptTokens + completionTokens,
 		}
 	}
+	var content string
+	if len(simpleResponse.Choices) > 0 {
+		reasoningContent := simpleResponse.Choices[0].Message.ReasoningContent
+		if len(reasoningContent) > 0 {
+			content = "\n<think>\n" + reasoningContent + "\n</think>\n" + simpleResponse.Choices[0].Message.StringContent()
+		} else {
+			content = simpleResponse.Choices[0].Message.StringContent()
+		}
+	}
+	simpleResponse.Usage.Content = content
 	return nil, &simpleResponse.Usage
 }
 
