@@ -121,9 +121,9 @@ const OperationSetting = () => {
           <SettingsGeneral options={inputs} refresh={onRefresh} />
         </Card>
         {/* 绘图设置 */}
-        <Card style={{ marginTop: '10px' }}>
+        {/* <Card style={{ marginTop: '10px' }}>
           <SettingsDrawing options={inputs} refresh={onRefresh} />
-        </Card>
+        </Card> */}
         {/* 屏蔽词过滤设置 */}
         <Card style={{ marginTop: '10px' }}>
           <SettingsSensitiveWords options={inputs} refresh={onRefresh} />
@@ -145,9 +145,9 @@ const OperationSetting = () => {
           <SettingsCreditLimit options={inputs} refresh={onRefresh} />
         </Card>
         {/* 聊天设置 */}
-        <Card style={{ marginTop: '10px' }}>
+        {/* <Card style={{ marginTop: '10px' }}>
           <SettingsChats options={inputs} refresh={onRefresh} />
-        </Card>
+        </Card> */}
         {/* 分组倍率设置 */}
         <Card style={{ marginTop: '10px' }}>
           <GroupRatioSettings options={inputs} refresh={onRefresh} />

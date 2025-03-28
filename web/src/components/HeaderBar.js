@@ -136,20 +136,6 @@ const HeaderBar = () => {
       to: '/pricing',
       icon: <IconPriceTag style={headerIconStyle} />,
     },
-    // Only include the docs button if docsLink exists
-    ...(docsLink ? [{
-      text: t('文档'),
-      itemKey: 'docs',
-      isExternal: true,
-      externalLink: docsLink,
-      icon: <IconHelpCircle style={headerIconStyle} />,
-    }] : []),
-    {
-      text: t('关于'),
-      itemKey: 'about',
-      to: '/about',
-      icon: <IconInfoCircle style={headerIconStyle} />,
-    },
   ];
 
   async function logout() {

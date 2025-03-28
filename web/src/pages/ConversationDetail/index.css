@@ -1,0 +1,14 @@
+.semi-layout-content{
+    height: 100vh;
+}
+/* .semi-chat{
+    height: 100vh !important;
+} */
+blockquote{
+
+    border-left: 2px solid #e5e5e5;
+    padding: 8px 16px;
+    margin: 16px 0;
+    background-color: #f5f5f5;
+    color: #8b8b8b;
+}

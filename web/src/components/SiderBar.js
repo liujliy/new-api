@@ -26,7 +26,7 @@ import {
   IconLayers,
   IconPriceTag,
   IconSetting,
-  IconUser
+  IconUser,
 } from '@douyinfe/semi-icons';
 import { Avatar, Dropdown, Layout, Nav, Switch, Divider } from '@douyinfe/semi-ui';
 import { setStatusData } from '../helpers/data.js';
@@ -76,6 +76,7 @@ const routerMap = {
   about: '/about',
   detail: '/detail',
   pricing: '/pricing',
+  conversation:'/conversation',
   task: '/task',
   playground: '/playground',
   personal: '/personal',
@@ -100,7 +101,7 @@ const SiderBar = () => {
   // 预先计算所有可能的图标样式
   const allItemKeys = useMemo(() => {
     const keys = ['home', 'channel', 'token', 'redemption', 'topup', 'user', 'log', 'midjourney',
-                 'setting', 'about', 'chat', 'detail', 'pricing', 'task', 'playground', 'personal'];
+                 'setting', 'about', 'chat', 'detail', 'pricing', 'conversation','task', 'playground', 'personal'];
     // 添加聊天项的keys
     for (let i = 0; i < chatItems.length; i++) {
       keys.push('chat' + i);
@@ -120,7 +121,7 @@ const SiderBar = () => {
   const workspaceItems = useMemo(
     () => [
       {
-        text: t('数据看板'),
+        text: t('用量情况'),
         itemKey: 'detail',
         to: '/detail',
         icon: <IconCalendarClock />,
@@ -135,6 +136,7 @@ const SiderBar = () => {
         to: '/token',
         icon: <IconKey />,
       },
+    
       {
         text: t('使用日志'),
         itemKey: 'log',
@@ -151,16 +153,16 @@ const SiderBar = () => {
             ? ''
             : 'tableHiddle',
       },
-      {
-        text: t('任务日志'),
-        itemKey: 'task',
-        to: '/task',
-        icon: <IconChecklistStroked />,
-        className:
-          localStorage.getItem('enable_task') === 'true'
-            ? ''
-            : 'tableHiddle',
-      }
+      // {
+      //   text: t('任务日志'),
+      //   itemKey: 'task',
+      //   to: '/task',
+      //   icon: <IconChecklistStroked />,
+      //   className:
+      //     localStorage.getItem('enable_task') === 'true'
+      //       ? ''
+      //       : 'tableHiddle',
+      // }
     ],
     [
       localStorage.getItem('enable_data_export'),
@@ -191,19 +193,19 @@ const SiderBar = () => {
   const adminItems = useMemo(
     () => [
       {
-        text: t('渠道'),
+        text: t('模型详情'),
         itemKey: 'channel',
         to: '/channel',
         icon: <IconLayers />,
         className: isAdmin() ? '' : 'tableHiddle',
       },
-      {
-        text: t('兑换码'),
-        itemKey: 'redemption',
-        to: '/redemption',
-        icon: <IconGift />,
-        className: isAdmin() ? '' : 'tableHiddle',
-      },
+      // {
+      //   text: t('兑换码'),
+      //   itemKey: 'redemption',
+      //   to: '/redemption',
+      //   icon: <IconGift />,
+      //   className: isAdmin() ? '' : 'tableHiddle',
+      // },
       {
         text: t('用户管理'),
         itemKey: 'user',
@@ -216,6 +218,18 @@ const SiderBar = () => {
         to: '/setting',
         icon: <IconSetting />,
       },
+      {
+        text: t('服务定价'),
+        itemKey: 'pricing',
+        to: '/pricing',
+        icon: <IconPriceTag />,
+      },
+      {
+        text: t('会话记录'),
+        itemKey: 'conversation',
+        to: '/conversation',
+        icon: <IconComment />,
+      },
     ],
     [isAdmin(), t],
   );
@@ -227,7 +241,13 @@ const SiderBar = () => {
         itemKey: 'playground',
         to: '/playground',
         icon: <IconCommentStroked />,
-      }
+      },
+      {
+        text: t('聊天'),
+        itemKey: 'chat',
+        items: chatItems,
+        icon: <IconComment />,
+      },
     ],
     [chatItems, t],
   );
@@ -389,8 +409,8 @@ const SiderBar = () => {
           setOpenedKeys(data.openKeys);
         }}
       >
-        {/* Chat Section - Only show if there are chat items */}
-        {chatMenuItems.map((item) => {
+        {/* Playground 跟聊天部分 */}
+        {/* {chatMenuItems.map((item) => {
           if (item.items && item.items.length > 0) {
             return (
               <Nav.Sub
@@ -418,7 +438,7 @@ const SiderBar = () => {
               />
             );
           }
-        })}
+        })} */}
 
         {/* Divider */}
         <Divider style={dividerStyle} />

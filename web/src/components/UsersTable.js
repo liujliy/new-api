@@ -85,39 +85,39 @@ const UsersTable = () => {
         );
       },
     },
-    {
-      title: t('邀请信息'),
-      dataIndex: 'invite',
-      render: (text, record, index) => {
-        return (
-          <div>
-            <Space spacing={1}>
-              <Tooltip content={t('邀请人数')}>
-                <Tag color='white' size='large'>
-                  {renderNumber(record.aff_count)}
-                </Tag>
-              </Tooltip>
-              <Tooltip content={t('邀请总收益')}>
-                <Tag color='white' size='large'>
-                  {renderQuota(record.aff_history_quota)}
-                </Tag>
-              </Tooltip>
-              <Tooltip content={t('邀请人ID')}>
-                {record.inviter_id === 0 ? (
-                  <Tag color='white' size='large'>
-                    {t('无')}
-                  </Tag>
-                ) : (
-                  <Tag color='white' size='large'>
-                    {record.inviter_id}
-                  </Tag>
-                )}
-              </Tooltip>
-            </Space>
-          </div>
-        );
-      },
-    },
+    // {
+    //   title: t('邀请信息'),
+    //   dataIndex: 'invite',
+    //   render: (text, record, index) => {
+    //     return (
+    //       <div>
+    //         <Space spacing={1}>
+    //           <Tooltip content={t('邀请人数')}>
+    //             <Tag color='white' size='large'>
+    //               {renderNumber(record.aff_count)}
+    //             </Tag>
+    //           </Tooltip>
+    //           <Tooltip content={t('邀请总收益')}>
+    //             <Tag color='white' size='large'>
+    //               {renderQuota(record.aff_history_quota)}
+    //             </Tag>
+    //           </Tooltip>
+    //           <Tooltip content={t('邀请人ID')}>
+    //             {record.inviter_id === 0 ? (
+    //               <Tag color='white' size='large'>
+    //                 {t('无')}
+    //               </Tag>
+    //             ) : (
+    //               <Tag color='white' size='large'>
+    //                 {record.inviter_id}
+    //               </Tag>
+    //             )}
+    //           </Tooltip>
+    //         </Space>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       title: t('角色'),
       dataIndex: 'role',

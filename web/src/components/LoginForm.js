@@ -200,7 +200,8 @@ const LoginForm = () => {
                     label={t('密码')}
                     placeholder={t('密码')}
                     name='password'
-                    type='password'
+                    // type='password'
+                    mode="password"
                     onChange={(value) => handleChange('password', value)}
                   />
 
@@ -222,12 +223,12 @@ const LoginForm = () => {
                     marginTop: 20,
                   }}
                 >
-                  <Text>
+                  {/* <Text>
                     {t('没有账户？')} <Link to='/register'>{t('点击注册')}</Link>
-                  </Text>
-                  <Text>
+                  </Text> */}
+                  {/* <Text>
                     {t('忘记密码？')} <Link to='/reset'>{t('点击重置')}</Link>
-                  </Text>
+                  </Text> */}
                 </div>
                 {status.github_oauth ||
                 status.oidc_enabled ||

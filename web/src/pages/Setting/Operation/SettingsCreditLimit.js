@@ -78,7 +78,7 @@ export default function SettingsCreditLimit(props) {
             <Row gutter={16}>
               <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.InputNumber
-                  label={t('新用户初始额度')}
+                  label={t('新用户初始额度(初始星星数量)')}
                   field={'QuotaForNewUser'}
                   step={1}
                   min={0}

@@ -92,7 +92,7 @@ export default function GeneralSettings(props) {
         >
           <Form.Section text={t('通用设置')}>
             <Row gutter={16}>
-              <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+              {/* <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.Input
                   field={'TopUpLink'}
                   label={t('充值链接')}
@@ -101,8 +101,8 @@ export default function GeneralSettings(props) {
                   onChange={onChange}
                   showClear
                 />
-              </Col>
-              <Col xs={24} sm={12} md={8} lg={8} xl={8}>
+              </Col> */}
+              {/* <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.Input
                   field={'general_setting.docs_link'}
                   label={t('文档地址')}
@@ -111,11 +111,11 @@ export default function GeneralSettings(props) {
                   onChange={onChange}
                   showClear
                 />
-              </Col>
+              </Col> */}
               <Col xs={24} sm={12} md={8} lg={8} xl={8}>
                 <Form.Input
                   field={'QuotaPerUnit'}
-                  label={t('单位美元额度')}
+                  label={t('单位额度')}
                   initValue={''}
                   placeholder={t('一单位货币能兑换的额度')}
                   onChange={onChange}

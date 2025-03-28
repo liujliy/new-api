@@ -1,6 +1,9 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig, transformWithEsbuild } from 'vite';
 
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -53,7 +56,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    proxy: {
+    proxy: isDevelopment? {
       "/api": {
         target: "https://www.qiansuoda.com/ai-admin/api/", // 目标服务器地址
         changeOrigin: true, // 允许跨域
@@ -66,6 +69,6 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/v1/, ""),
 
       },
-    },
+    }:{},
   },
 });

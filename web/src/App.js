@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useContext, useEffect } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation,Navigate } from 'react-router-dom';
 import Loading from './components/Loading';
 import User from './pages/User';
 import { PrivateRoute } from './components/PrivateRoute';
@@ -21,10 +21,12 @@ import Chat2Link from './pages/Chat2Link';
 import { Layout } from '@douyinfe/semi-ui';
 import Midjourney from './pages/Midjourney';
 import Pricing from './pages/Pricing/index.js';
+import Conversation from './pages/Conversation/index.js'
 import Task from "./pages/Task/index.js";
 import Playground from './pages/Playground/Playground.js';
 import OAuth2Callback from "./components/OAuth2Callback.js";
 import PersonalSetting from './components/PersonalSetting.js';
+import ConversationDetail from './pages/ConversationDetail/index.js'
 
 // const Home = lazy(() => import('./pages/Home'));
 const Detail = lazy(() => import('./pages/Detail'));
@@ -40,7 +42,7 @@ function App() {
           path='/'
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
-              <Detail />
+              <Navigate to ='/detail' replace/>
             </Suspense>
           }
         />
@@ -182,6 +184,14 @@ function App() {
             </PrivateRoute>
           }
         />
+         <Route
+          path='/conversationdetail'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <ConversationDetail />
+            </Suspense>
+          }
+        />
         <Route
           path='/personal'
           element={
@@ -245,6 +255,14 @@ function App() {
           element={
             <Suspense fallback={<Loading></Loading>} key={location.pathname}>
               <Pricing />
+            </Suspense>
+          }
+        />
+         <Route
+          path='/Conversation'
+          element={
+            <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+              <Conversation />
             </Suspense>
           }
         />

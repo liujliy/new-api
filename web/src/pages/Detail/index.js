@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { initVChartSemiTheme } from '@visactor/vchart-semi-theme';
 
-import { Button, Card, Col, Descriptions, Form, Layout, Row, Spin, Tabs } from '@douyinfe/semi-ui';
+import { Button, Card, Col, Descriptions, Form, Layout, Row, Spin, Tabs,Image } from '@douyinfe/semi-ui';
 import { VChart } from "@visactor/react-vchart";
 import {
   API,
@@ -472,6 +472,8 @@ const Detail = (props) => {
               </Form.Section>
             </>
           </Form>
+
+          
           <Spin spinning={loading}>
             <Row gutter={{ xs: 16, sm: 16, md: 16, lg: 24, xl: 24, xxl: 24 }} style={{marginTop: 20}} type="flex" justify="space-between">
               <Col span={styleState.isMobile?24:8}>

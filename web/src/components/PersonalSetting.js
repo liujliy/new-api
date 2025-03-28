@@ -512,7 +512,7 @@ const PersonalSetting = () => {
                                 </Descriptions.Item>
                             </Descriptions>
                         </Card>
-                        <Card
+                        {/* <Card
                             style={{marginTop: 10}}
                             footer={
                                 <div>
@@ -550,8 +550,8 @@ const PersonalSetting = () => {
                                     </Descriptions.Item>
                                 </Descriptions>
                             </div>
-                        </Card>
-                        <Card style={{marginTop: 10}}>
+                        </Card> */}
+                        {/* <Card style={{marginTop: 10}}>
                             <Typography.Title heading={6}>{t('个人信息')}</Typography.Title>
                             <div style={{marginTop: 20}}>
                                 <Typography.Text strong>{t('邮箱')}</Typography.Text>
@@ -785,7 +785,7 @@ const PersonalSetting = () => {
                                     </Button>
                                 </Modal>
                             </div>
-                        </Card>
+                        </Card> */}
                         <Card style={{marginTop: 10}}>
                             <Typography.Title heading={6}>{t('通知设置')}</Typography.Title>
                             <div style={{marginTop: 20}}>
