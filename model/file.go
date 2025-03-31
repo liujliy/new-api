@@ -16,7 +16,14 @@ type File struct {
 }
 
 func (file *File) Insert() error {
-	err := DB.Create(file).Error
+	var existFile File
+	// 检查是否存在相同的记录
+	err := DB.Where("user_id = ? AND channel_id = ? AND file_id = ?", file.UserID, file.ChannelId, file.FileID).First(&existFile).Error
+	if err == nil {
+		// 如果存在，则更新记录
+		return file.Update()
+	}
+	err = DB.Create(file).Error
 	return err
 }
 

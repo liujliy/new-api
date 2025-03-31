@@ -349,7 +349,7 @@ func OpenaiSTTHandler(c *gin.Context, resp *http.Response, info *relaycommon.Rel
 	return nil, usage
 }
 
-func OpenaiFileHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (*dto.OpenAIErrorWithStatusCode, *dto.Usage) {
+func OpenaiFileHandler(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (*dto.OpenAIErrorWithStatusCode, *dto.FileResponse) {
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return service.OpenAIErrorWrapper(err, "read_response_body_failed", http.StatusInternalServerError), nil
@@ -358,6 +358,8 @@ func OpenaiFileHandler(c *gin.Context, resp *http.Response, info *relaycommon.Re
 	if err != nil {
 		return service.OpenAIErrorWrapper(err, "close_response_body_failed", http.StatusInternalServerError), nil
 	}
+	fileInfo := &dto.FileResponse{}
+	err = json.Unmarshal(responseBody, fileInfo)
 	resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
 
 	for k, v := range resp.Header {
@@ -369,7 +371,7 @@ func OpenaiFileHandler(c *gin.Context, resp *http.Response, info *relaycommon.Re
 		return service.OpenAIErrorWrapper(err, "copy_response_body_failed", http.StatusInternalServerError), nil
 	}
 	resp.Body.Close()
-	return nil, nil
+	return nil, fileInfo
 }
 
 func countAudioTokens(c *gin.Context) (int, error) {
