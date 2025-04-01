@@ -4,6 +4,7 @@ import { API, isMobile, showError, showSuccess } from '../../helpers';
 import { renderQuota, renderQuotaWithPrompt } from '../../helpers/render';
 import Title from '@douyinfe/semi-ui/lib/es/typography/title';
 import {
+  TimePicker,
   Button,
   Divider,
   Input,
@@ -31,6 +32,8 @@ const EditUser = (props) => {
     email: '',
     quota: 0,
     group: 'default',
+    start_time_limit:'',
+    end_time_limit:''
   });
   const [groupOptions, setGroupOptions] = useState([]);
   const {
@@ -46,7 +49,7 @@ const EditUser = (props) => {
     group,
   } = inputs;
   const handleInputChange = (name, value) => {
-    setInputs((inputs) => ({ ...inputs, [name]: value }));
+    setInputs((inputs) => ({ ...inputs, [name]: value}));
   };
   const fetchGroups = async () => {
     try {
@@ -112,7 +115,32 @@ const EditUser = (props) => {
     }
     setLoading(false);
   };
+  const onChangeStartTime = (date, dateString) => {
+    console.log(date, dateString);
+    // setInputs((inputs) => ({ ...inputs, start_time_limit: dateString[0],end_time_limit:end_time_limit }));
+    setInputs((inputs) => ({ ...inputs, ['start_time_limit']:timeFormat(`2021-03-27 ${dateString[0]}:00`),['end_time_limit']:timeFormat(`2021-03-27 ${dateString[1]}:00`) }));
 
+    // date 是包含开始时间和结束时间的数组，例如 [startDate, endDate]
+    // dateString 是包含开始时间和结束时间的字符串数组，例如 ["2024-01-01", "2024-01-31"]
+    
+  };
+
+  const donbaToTime=(isoDateStr)=>{
+    const date = new Date(isoDateStr);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;   
+  }
+
+  const timeFormat=(dateStr)=>{
+    const date = new Date(dateStr);
+// 获取东八区的偏移量（分钟）
+    const offset = 8 * 60; 
+    // 设置时区偏移量
+    date.setMinutes(date.getMinutes() + offset); 
+    return date.toISOString().replace('Z', `+08:00`);
+   
+  }
   const addLocalQuota = () => {
     let newQuota = parseInt(quota) + parseInt(addQuotaLocal);
     setInputs((inputs) => ({ ...inputs, quota: newQuota }));
@@ -172,7 +200,7 @@ const EditUser = (props) => {
           <Input
             label={t('密码')}
             name='password'
-            type={'password'}
+            mode={'password'}
             placeholder={t('请输入新的密码，最短 8 位')}
             onChange={(value) => handleInputChange('password', value)}
             value={password}
@@ -201,12 +229,22 @@ const EditUser = (props) => {
                 search
                 selection
                 allowAdditions
-                additionLabel={t('请在系统设置页面编辑分组倍率以添加新的分组：')}
+                additionLabel={t(
+                  '请在系统设置页面编辑分组倍率以添加新的分组：',
+                )}
                 onChange={(value) => handleInputChange('group', value)}
                 value={inputs.group}
                 autoComplete='new-password'
                 optionList={groupOptions}
               />
+              <div style={{ marginTop: 20 }}>
+                <TimePicker
+                  type='timeRange'
+                  format='HH:mm'
+                  value={[donbaToTime(inputs['start_time_limit']), donbaToTime(inputs['end_time_limit'])]}
+                  onChange={onChangeStartTime}
+                />
+              </div>
               <div style={{ marginTop: 20 }}>
                 <Typography.Text>{`${t('剩余额度')}${renderQuotaWithPrompt(quota)}`}</Typography.Text>
               </div>

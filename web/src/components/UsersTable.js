@@ -354,7 +354,7 @@ const UsersTable = () => {
   const handlePageChange = (page) => {
     setActivePage(page);
     if (searchKeyword === '' && searchGroup === '') {
-        loadUsers(page, pageSize).then();
+      loadUsers(page, pageSize).then();
     } else {
         searchUsers(page, pageSize, searchKeyword, searchGroup).then();
     }

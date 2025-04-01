@@ -7,7 +7,7 @@ import {
   IconSidebar,
   IconChevronDown,
 } from '@douyinfe/semi-icons';
-import './index.css'
+import './index.scss'
 const roleInfo = {
   user: {
     name: 'User',
@@ -29,7 +29,7 @@ const roleInfo = {
 const ConversationDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = location.state || {};
+  const { id,type } = location.state || {};
   const [message, setMessage] = useState();
 
   useEffect(() => {
@@ -59,20 +59,33 @@ const ConversationDetail = () => {
         setMessage(data);
 
         setMessage((messages) => {
-            return messages.map((element) => {
-                try {
-                    const parsed = JSON.parse(element.content);
-                    // 这里可以对parsed对象进行修改，例如添加一个新属性
-                    // 将修改后的对象重新转换为字符串
-                    element.content = parsed
-                } catch (error) {
-                    // 如果解析失败，调用detailStr函数，这里假设detailStr函数已经定义
-                    if(typeof(element.content) == "string"){
-                        element.content = detailStr(element.content);
-                    }
+          return messages.map((element) => {
+            const newElement = { ...element };
+        
+            try {
+              if (newElement.content_type === "text") {
+                newElement.content = detailStr(newElement.content);
+              } else if (newElement.content_type === "image") {
+                const parsed = JSON.parse(newElement.content);
+                if (Array.isArray(parsed.data)) {
+                  newElement.content = parsed.data.map(e => ({
+                    type: "image_url",
+                    image_url: { url: e.url }
+                  }));
+                } else {
+                  console.warn("Invalid image data format", parsed);
+                  newElement.content = [];
                 }
-                return element;
-            });
+              } else {
+                newElement.content = JSON.parse(newElement.content);
+              }
+            } catch (error) {
+              console.error("Error parsing content:", error, newElement);
+              // 这里可以考虑是否保留原始 content 或设置为 null
+            }
+        
+            return newElement;
+          });
         });
         
     } else {
@@ -86,7 +99,7 @@ const ConversationDetail = () => {
     border: '1px solid var(--semi-color-border)',
     borderRadius: '16px',
     margin: '8px 16px',
-    height: 550,
+    height: 'calc(100vh -90px)',
   };
   //输入框为空
   const renderInputArea = useCallback((props) => {
@@ -94,8 +107,8 @@ const ConversationDetail = () => {
   }, []);
 
   return (
-    <>
-      <Button
+    <div className='chatcontent'>
+    <div style={{width:'100%', display:'flex'}}><Button
         icon={<IconArrowLeft />}
         theme='solid'
         style={{ marginRight: 10 }}
@@ -104,7 +117,8 @@ const ConversationDetail = () => {
         }}
       >
         返回
-      </Button>
+      </Button></div>
+      
 
       <Chat
         mode={'userBubble'}
@@ -113,7 +127,7 @@ const ConversationDetail = () => {
         chats={message}
         roleConfig={roleInfo}
       />
-    </>
+    </div>
   );
 };
 

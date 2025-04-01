@@ -33,13 +33,15 @@ const ModelPricing = () => {
   const [isModalOpenurl, setIsModalOpenurl] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState('default');
 
+  const [inputValue, SetInputValue] = useState();
+
   const rowSelection = useMemo(
-      () => ({
-          onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRowKeys(selectedRowKeys);
-          },
-      }),
-      []
+    () => ({
+      onChange: (selectedRowKeys, selectedRows) => {
+        setSelectedRowKeys(selectedRowKeys);
+      },
+    }),
+    [],
   );
 
   const handleChange = (value) => {
@@ -59,7 +61,7 @@ const ModelPricing = () => {
     const newFilteredValue = value ? [value] : [];
     setFilteredValue(newFilteredValue);
   };
-  
+
   function renderQuotaType(type) {
     // Ensure all cases are string literals by adding quotes.
     switch (type) {
@@ -79,7 +81,7 @@ const ModelPricing = () => {
         return t('未知');
     }
   }
-  
+
   function renderAvailable(available) {
     return (
       <Popover
@@ -96,17 +98,17 @@ const ModelPricing = () => {
           borderStyle: 'solid',
         }}
       >
-        <IconVerify style={{ color: 'green' }}  size="large" />
+        <IconVerify style={{ color: 'green' }} size='large' />
       </Popover>
-    )
+    );
   }
-
+ 
   const columns = [
     {
       title: t('可用性'),
       dataIndex: 'available',
       render: (text, record, index) => {
-         // if record.enable_groups contains selectedGroup, then available is true
+        // if record.enable_groups contains selectedGroup, then available is true
         return renderAvailable(record.enable_groups.includes(selectedGroup));
       },
       sorter: (a, b) => a.available - b.available,
@@ -145,15 +147,15 @@ const ModelPricing = () => {
       title: t('可用分组'),
       dataIndex: 'enable_groups',
       render: (text, record, index) => {
-        
         // enable_groups is a string array
         return (
           <Space>
-            {text.map((group) => {
+            {text.map((group, groupindex) => {
               if (usableGroup[group]) {
                 if (group === selectedGroup) {
                   return (
                     <Tag
+                      key={groupindex}
                       color='blue'
                       size='large'
                       prefixIcon={<IconVerify />}
@@ -164,14 +166,17 @@ const ModelPricing = () => {
                 } else {
                   return (
                     <Tag
+                      key={groupindex}
                       color='blue'
                       size='large'
                       onClick={() => {
                         setSelectedGroup(group);
-                        showInfo(t('当前查看的分组为：{{group}}，倍率为：{{ratio}}', {
-                          group: group,
-                          ratio: groupRatio[group]
-                        }));
+                        showInfo(
+                          t('当前查看的分组为：{{group}}，倍率为：{{ratio}}', {
+                            group: group,
+                            ratio: groupRatio[group],
+                          }),
+                        );
                       }}
                     >
                       {group}
@@ -186,22 +191,23 @@ const ModelPricing = () => {
     },
     {
       title: () => (
-        <span style={{'display':'flex','alignItems':'center'}}>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
           {t('倍率')}
           <Popover
             content={
               <div style={{ padding: 8 }}>
-                {t('倍率是为了方便换算不同价格的模型')}<br/>
+                {t('倍率是为了方便换算不同价格的模型')}
+                <br />
                 {t('点击查看倍率说明')}
               </div>
             }
             position='top'
             style={{
-                backgroundColor: 'rgba(var(--semi-blue-4),1)',
-                borderColor: 'rgba(var(--semi-blue-4),1)',
-                color: 'var(--semi-color-white)',
-                borderWidth: 1,
-                borderStyle: 'solid',
+              backgroundColor: 'rgba(var(--semi-blue-4),1)',
+              borderColor: 'rgba(var(--semi-blue-4),1)',
+              color: 'var(--semi-color-white)',
+              borderWidth: 1,
+              borderStyle: 'solid',
             }}
           >
             <IconHelpCircle
@@ -219,11 +225,18 @@ const ModelPricing = () => {
         let completionRatio = parseFloat(record.completion_ratio.toFixed(3));
         content = (
           <>
-            <Text>{t('模型倍率')}：{record.quota_type === 0 ? text : t('无')}</Text>
+            <Text>
+              {t('模型倍率')}：{record.quota_type === 0 ? text : t('无')}
+            </Text>
             <br />
-            <Text>{t('补全倍率')}：{record.quota_type === 0 ? completionRatio : t('无')}</Text>
+            <Text>
+              {t('补全倍率')}：
+              {record.quota_type === 0 ? completionRatio : t('无')}
+            </Text>
             <br />
-            <Text>{t('分组倍率')}：{groupRatio[selectedGroup]}</Text>
+            <Text>
+              {t('分组倍率')}：{groupRatio[selectedGroup]}
+            </Text>
           </>
         );
         return <div>{content}</div>;
@@ -236,21 +249,70 @@ const ModelPricing = () => {
         let content = text;
         if (record.quota_type === 0) {
           // 这里的 *2 是因为 1倍率=0.002刀，请勿删除
-          let inputRatioPrice = record.model_ratio * 2 * groupRatio[selectedGroup];
+          let inputRatioPrice =
+            record.model_ratio * 2 * groupRatio[selectedGroup];
           let completionRatioPrice =
             record.model_ratio *
-            record.completion_ratio * 2 *
+            record.completion_ratio *
+            2 *
             groupRatio[selectedGroup];
           content = (
             <>
-              <Text>{t('提示')} ${inputRatioPrice} / 1M tokens</Text>
+              <Text>
+                {t('提示')} {inputRatioPrice} / 1M tokens
+              </Text>
               <br />
-              <Text>{t('补全')} ${completionRatioPrice} / 1M tokens</Text>
+              <Text>
+                {t('补全')} {completionRatioPrice} / 1M tokens
+              </Text>
             </>
           );
         } else {
           let price = parseFloat(text) * groupRatio[selectedGroup];
-          content = <>${t('模型价格')}：${price}</>;
+          content = (
+            <>
+              {t('模型价格')}：{price}
+            </>
+          );
+        }
+        return <div>{content}</div>;
+      },
+    },
+    {
+      title: t('价格修改'),
+      dataIndex: 'model_price',
+      render: (text, record, index) => {
+        let content = text;
+
+        if (record.quota_type === 0) {
+          let inputRatioPrice =
+            record.model_ratio * 2 * groupRatio[selectedGroup];
+          content = (
+            <>
+              <Button
+                label={t('编辑')}
+                type='primary'
+                className='btn-margin-right'
+                onClick={() => OpenChangeModal(record, inputRatioPrice)}
+              >
+                {t('编辑价格')}
+              </Button>
+            </>
+          );
+        } else {
+          let price = parseFloat(text) * groupRatio[selectedGroup];
+          content = (
+            <>
+              <Button
+                label={t('编辑')}
+                type='primary'
+                className='btn-margin-right'
+                onClick={() => OpenChangeModal(record, price)}
+              >
+                {t('编辑价格')}
+              </Button>
+            </>
+          );
         }
         return <div>{content}</div>;
       },
@@ -262,7 +324,10 @@ const ModelPricing = () => {
   const [userState, userDispatch] = useContext(UserContext);
   const [groupRatio, setGroupRatio] = useState({});
   const [usableGroup, setUsableGroup] = useState({});
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modelData,setSelectModelData]=useState();
+  const [ratioOptions,setRatioOptions] = useState({});
+  const [priceOptions,setPriceOptions] =useState({});
   const setModelsFormat = (models, groupRatio) => {
     for (let i = 0; i < models.length; i++) {
       models[i].key = models[i].model_name;
@@ -300,13 +365,67 @@ const ModelPricing = () => {
     if (success) {
       setGroupRatio(group_ratio);
       setUsableGroup(usable_group);
-      setSelectedGroup(userState.user ? userState.user.group : 'default')
+      setSelectedGroup(userState.user ? userState.user.group : 'default');
       setModelsFormat(data, group_ratio);
+      let ratioOptions={}
+      let priceOptions={}
+      data.forEach((element) => {
+        if(element.quota_type ==0){
+          ratioOptions[element.model_name] = element.model_ratio;
+        }else{
+          priceOptions[element.model_name] = element.model_price;
+        }
+      });
+      setRatioOptions(ratioOptions)
+      setPriceOptions(priceOptions)
     } else {
       showError(message);
     }
     setLoading(false);
   };
+
+  const changeRatio = async () => {
+    setLoading(true);
+    let url = '';
+    url = `/api/option/`;
+    const res = await API.put(url, {
+      key: 'ModelRatio',
+      value: JSON.stringify(ratioOptions)
+    });
+    const { success, message } = res.data;
+
+    if (success) {
+      showSuccess('价格修改成功');
+      loadPricing()
+    } else {
+      showError(message);
+    }
+    setLoading(false);
+
+  };
+
+  const changePrice= async()=>{
+    setLoading(true);
+    let url = '';
+    url = `/api/option/`;
+
+    const res = await API.put(url, {
+      key: 'ModelPrice',
+      value: JSON.stringify(priceOptions),
+    });
+    const { success, message } = res.data;
+
+    if (success) {
+      showSuccess('价格修改成功');
+      loadPricing()
+    } else {
+      showError(message);
+    }
+
+    setLoading(false);
+    // 
+
+  }
 
   const refresh = async () => {
     await loadPricing();
@@ -321,41 +440,105 @@ const ModelPricing = () => {
     }
   };
 
+  const OpenChangeModal = (record, inputRatioPrice) => {
+    setSelectModelData(record);
+    SetInputValue(inputRatioPrice);
+    
+    setModalVisible(true);
+  };
+
+  const handleOk = () => {
+    if(modelData.quota_type ==0){
+      setRatioOptions(ratioOptions=>{
+        let newratioOptions = ratioOptions
+        newratioOptions[modelData.model_name]=inputValue/2;
+        return newratioOptions
+      })
+     
+      changeRatio();
+    }else{
+      setPriceOptions(priceOptions=>{
+        let newpriceOptions = priceOptions;
+        newpriceOptions[modelData.model_name] =parseInt(inputValue) 
+        return newpriceOptions
+      })
+      changePrice();
+    }
+    setModalVisible(false);
+    //修改对应数据
+  };
+  const handleCancel = () => {
+    setModalVisible(false);
+    console.log('Cancel button clicked');
+  };
+  const handleAfterClose = () => {
+    console.log('After Close callback executed');
+  };
+  const onChangePrice=(value, e)=>{
+    console.log(value)
+    SetInputValue(value)
+  }
+
   useEffect(() => {
     refresh().then();
   }, []);
 
   return (
     <>
+      <Modal
+        title='修改价格'
+        visible={modalVisible}
+        onOk={handleOk}
+        afterClose={handleAfterClose} //>=1.16.0
+        onCancel={handleCancel}
+        closeOnEsc={true}
+      >
+        <Input 
+        showClear 
+        value={inputValue} 
+        placeholder={'输入价格'}
+        type={'number'}
+        onChange={onChangePrice}
+        ></Input>
+      </Modal>
       <Layout>
         {userState.user ? (
           <Banner
-            type="success"
+            type='success'
             fullMode={false}
-            closeIcon="null"
+            closeIcon='null'
             description={t('您的默认分组为：{{group}}，分组倍率为：{{ratio}}', {
               group: userState.user.group,
-              ratio: groupRatio[userState.user.group]
+              ratio: groupRatio[userState.user.group],
             })}
           />
         ) : (
           <Banner
             type='warning'
             fullMode={false}
-            closeIcon="null"
+            closeIcon='null'
             description={t('您还未登陆，显示的价格为默认分组倍率: {{ratio}}', {
-              ratio: groupRatio['default']
+              ratio: groupRatio['default'],
             })}
           />
         )}
-        <br/>
-        <Banner 
-            type="info"
-            fullMode={false}
-            description={<div>{t('按量计费费用 = 分组倍率 × 模型倍率 × （提示token数 + 补全token数 × 补全倍率）/ 500000 （单位：美元）')}</div>}
-            closeIcon="null"
+        <br />
+        <Banner
+          type='info'
+          fullMode={false}
+          description={
+            <div>
+              {/* {t(
+                '按量计费费用 = 分组倍率 × 模型倍率 × （提示token数 + 补全token数 × 补全倍率）/ 500000 （单位：美元）',
+              )} */}
+              {t(
+                '按量计费费用 = 分组倍率 × 模型倍率 × （提示token数 + 补全token数 × 补全倍率）/ 500000',
+              )}
+            </div>
+          }
+          closeIcon='null'
         />
-        <br/>
+        <br />
         <Space style={{ marginBottom: 16 }}>
           <Input
             placeholder={t('模糊搜索模型名称')}
@@ -368,11 +551,11 @@ const ModelPricing = () => {
           <Button
             theme='light'
             type='tertiary'
-            style={{width: 150}}
+            style={{ width: 150 }}
             onClick={() => {
               copyText(selectedRowKeys);
             }}
-            disabled={selectedRowKeys == ""}
+            disabled={selectedRowKeys == ''}
           >
             {t('复制选中模型')}
           </Button>
@@ -387,7 +570,7 @@ const ModelPricing = () => {
               t('第 {{start}} - {{end}} 条，共 {{total}} 条', {
                 start: page.currentStart,
                 end: page.currentEnd,
-                total: models.length
+                total: models.length,
               }),
             pageSize: models.length,
             showSizeChanger: false,

@@ -1,0 +1,36 @@
+.chatcontent{
+    height:100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .semi-layout-content{
+        height: calc(100vh - 90px) ;
+        // display: flex;
+        // flex-direction: column;
+        // align-items: center;
+        
+    }
+    
+    .semi-chat{
+        width: 80%;
+        height: calc(100vh - 200px) !important;
+    }
+    .semi-chat-chatBox-content .semi-chat-attachment-file, .semi-chat-chatBox-content .semi-chat-attachment-img{
+        width: 100% !important;
+        height: auto !important;
+    }
+    .semi-chat-chatBox-content img{
+        height: 300px;
+        width: auto;
+    } 
+    
+    blockquote{
+    
+        border-left: 2px solid #e5e5e5;
+        padding: 8px 16px;
+        margin: 16px 0;
+        background-color: #f5f5f5;
+        color: #8b8b8b;
+    }
+}

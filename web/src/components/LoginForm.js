@@ -200,7 +200,6 @@ const LoginForm = () => {
                     label={t('密码')}
                     placeholder={t('密码')}
                     name='password'
-                    // type='password'
                     mode="password"
                     onChange={(value) => handleChange('password', value)}
                   />

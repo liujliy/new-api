@@ -95,7 +95,7 @@ const AddUser = (props) => {
             style={{ marginTop: 20 }}
             label='密 码'
             name='password'
-            type={'password'}
+            mode="password"
             addonBefore={'密码'}
             placeholder={'请输入密码'}
             onChange={(value) => handleInputChange('password', value)}

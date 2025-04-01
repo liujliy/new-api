@@ -1,10 +1,10 @@
 import React from 'react';
 import TableConversation from '../../components/TableConversation.js';
 
-const Pricing = () => (
+const Conversation = () => (
   <>
     <TableConversation />
   </>
 );
 
-export default Pricing;
+export default Conversation;
