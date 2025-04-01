@@ -49,13 +49,16 @@ func GetConversationsByUserID(userID int) ([]*Conversation, error) {
 }
 
 // 获取会话列表
-func ListConversations(username string, title string, startTime int64, endTime int64, startIndex int, limit int) (conversations []*Conversation, total int64, err error) {
+func ListConversations(username string, title string, conversationType string, startTime int64, endTime int64, startIndex int, limit int) (conversations []*Conversation, total int64, err error) {
 	query := DB.Model(&Conversation{})
 	if username != "" {
 		query = query.Where("username = ?", username)
 	}
 	if title != "" {
-		query = query.Where("title like %?%", title)
+		query = query.Where("title like ?", "%"+title+"%")
+	}
+	if conversationType != "" {
+		query = query.Where("type = ?", conversationType)
 	}
 	if startTime != 0 {
 		query = query.Where("created_at >= ?", time.Unix(startTime, 0))

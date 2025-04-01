@@ -39,9 +39,10 @@ func ListConversations(c *gin.Context) {
 	}
 	username := c.Query("username")
 	title := c.Query("title")
+	conversationType := c.Query("type")
 	startTime, _ := strconv.ParseInt(c.Query("start_time"), 10, 64)
 	endTime, _ := strconv.ParseInt(c.Query("end_time"), 10, 64)
-	conversations, total, err := model.ListConversations(username, title, startTime, endTime, (page-1)*page, pageSize)
+	conversations, total, err := model.ListConversations(username, title, conversationType, startTime, endTime, (page-1)*page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
