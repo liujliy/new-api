@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/dto"
+	"one-api/model"
 	relaycommon "one-api/relay/common"
 	"one-api/service"
 
@@ -12,7 +13,10 @@ import (
 
 func FileHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 	relayInfo := relaycommon.GenRelayInfo(c)
-
+	// 设置file_id
+	if c.Request.Method == http.MethodGet {
+		relayInfo.FileID = c.Param("id")
+	}
 	adaptor := GetAdaptor(relayInfo.ApiType)
 	if adaptor == nil {
 		return service.OpenAIErrorWrapperLocal(fmt.Errorf("invalid api type: %d", relayInfo.ApiType), "invalid_api_type", http.StatusBadRequest)
@@ -41,13 +45,27 @@ func FileHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 			return openaiErr
 		}
 	}
-
-	_, openaiErr = adaptor.DoResponse(c, httpResp, relayInfo)
+	fileInfo, openaiErr := adaptor.DoResponse(c, httpResp, relayInfo)
 	if openaiErr != nil {
 		// reset status code 重置状态码
 		service.ResetStatusCode(openaiErr, statusCodeMappingStr)
 		return openaiErr
 	}
+	if fileInfo == nil {
+		return nil
+	}
+	// 保存用户上传的文件
+	// 渠道对应的文件ID存在则更新状态，不存在则新增
+	file := &model.File{
+		UserID:      relayInfo.UserId,
+		Username:    c.GetString("username"),
+		ChannelId:   relayInfo.ChannelId,
+		ChannelName: c.GetString("channel_name"),
+		FileID:      fileInfo.(*dto.FileResponse).Id,
+		FileName:    fileInfo.(*dto.FileResponse).Filename,
+		Status:      fileInfo.(*dto.FileResponse).Status,
+	}
+	file.Insert()
 
 	return nil
 }

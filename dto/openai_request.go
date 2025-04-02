@@ -52,6 +52,8 @@ type GeneralOpenAIRequest struct {
 	Modalities          any               `json:"modalities,omitempty"`
 	Audio               any               `json:"audio,omitempty"`
 	ExtraBody           any               `json:"extra_body,omitempty"`
+	EnableSearch        bool              `json:"enable_search,omitempty"`
+	SearchOptions       any               `json:"search_options,omitempty"`
 }
 
 type ToolCallRequest struct {

@@ -37,6 +37,9 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 		fullRequestURL = fmt.Sprintf("%s/api/v1/services/aigc/text2image/image-synthesis", info.BaseUrl)
 	case constant.RelayModeFile:
 		fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/files", info.BaseUrl)
+		if info.FileID != "" {
+			fullRequestURL = fmt.Sprintf("%s/%s", fullRequestURL, info.FileID)
+		}
 	default:
 		fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/chat/completions", info.BaseUrl)
 	}
@@ -132,7 +135,7 @@ func (a *Adaptor) ConvertFileRequest(c *gin.Context, info *relaycommon.RelayInfo
 }
 
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (any, error) {
-	if info.RelayMode == constant.RelayModeFile {
+	if info.RelayMode == constant.RelayModeFile && c.Request.Method == http.MethodPost {
 		return channel.DoFormRequest(a, c, info, requestBody)
 	}
 	return channel.DoApiRequest(a, c, info, requestBody)

@@ -97,6 +97,19 @@ func TextHelper(c *gin.Context) (openaiErr *dto.OpenAIErrorWithStatusCode) {
 
 	textRequest.Model = relayInfo.UpstreamModelName
 
+	// 设置渠道自定义的SystemPrompt
+	if relayInfo.ChannelSystemPrompt != "" {
+		// 判断messges的第一个是否为system，不是则默认加上
+		if len(textRequest.Messages) != 0 && textRequest.Messages[0].Role != "system" {
+			systemMessage := dto.Message{
+				Role: "system",
+			}
+			systemMessage.SetStringContent(relayInfo.ChannelSystemPrompt)
+			// 加到第一个位置
+			textRequest.Messages = append([]dto.Message{systemMessage}, textRequest.Messages...)
+		}
+	}
+
 	// 获取 promptTokens，如果上下文中已经存在，则直接使用
 	var promptTokens int
 	if value, exists := c.Get("prompt_tokens"); exists {

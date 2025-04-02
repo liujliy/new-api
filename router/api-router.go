@@ -109,6 +109,7 @@ func SetApiRouter(router *gin.Engine) {
 		{
 			tokenRoute.GET("/", controller.GetAllTokens)
 			tokenRoute.GET("/search", controller.SearchTokens)
+			tokenRoute.GET("/list", controller.ListTokens)
 			tokenRoute.GET("/:id", controller.GetToken)
 			tokenRoute.POST("/", controller.AddToken)
 			tokenRoute.PUT("/", controller.UpdateToken)
@@ -160,6 +161,7 @@ func SetApiRouter(router *gin.Engine) {
 		conversationRoute.Use(middleware.UserAuth())
 		{
 			conversationRoute.GET("/list", controller.GetConversations)
+			conversationRoute.GET("/list_all", controller.ListConversations)
 			conversationRoute.GET("/:conversation_id/messages", controller.GetMessages)
 			conversationRoute.POST("/create", controller.CreateConversation)
 			conversationRoute.POST("/update", controller.UpdateConversation)

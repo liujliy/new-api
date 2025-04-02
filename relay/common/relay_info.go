@@ -77,6 +77,7 @@ type RelayInfo struct {
 	IsFirstRequest       bool
 	AudioUsage           bool
 	ReasoningEffort      string
+	ChannelSystemPrompt  string
 	ChannelSetting       map[string]interface{}
 	UserSetting          map[string]interface{}
 	UserEmail            string
@@ -84,6 +85,7 @@ type RelayInfo struct {
 	RelayFormat          string
 	SendResponseCount    int
 	OutputImageInfo      string
+	FileID               string
 	ThinkingContentInfo
 	ClaudeConvertInfo
 	*RerankerInfo
@@ -134,6 +136,7 @@ func GenRelayInfo(c *gin.Context) *RelayInfo {
 	channelType := c.GetInt("channel_type")
 	channelId := c.GetInt("channel_id")
 	channelSetting := c.GetStringMap("channel_setting")
+	channelSystemPrompt := c.GetString("channel_system_prompt")
 
 	tokenId := c.GetInt("token_id")
 	tokenKey := c.GetString("token_key")
@@ -165,13 +168,14 @@ func GenRelayInfo(c *gin.Context) *RelayInfo {
 		OriginModelName:   c.GetString("original_model"),
 		UpstreamModelName: c.GetString("original_model"),
 		//RecodeModelName:   c.GetString("original_model"),
-		IsModelMapped:  false,
-		ApiType:        apiType,
-		ApiVersion:     c.GetString("api_version"),
-		ApiKey:         strings.TrimPrefix(c.Request.Header.Get("Authorization"), "Bearer "),
-		Organization:   c.GetString("channel_organization"),
-		ChannelSetting: channelSetting,
-		RelayFormat:    RelayFormatOpenAI,
+		IsModelMapped:       false,
+		ApiType:             apiType,
+		ApiVersion:          c.GetString("api_version"),
+		ApiKey:              strings.TrimPrefix(c.Request.Header.Get("Authorization"), "Bearer "),
+		Organization:        c.GetString("channel_organization"),
+		ChannelSetting:      channelSetting,
+		ChannelSystemPrompt: channelSystemPrompt,
+		RelayFormat:         RelayFormatOpenAI,
 		ThinkingContentInfo: ThinkingContentInfo{
 			IsFirstThinkingContent:  true,
 			SendLastThinkingContent: false,

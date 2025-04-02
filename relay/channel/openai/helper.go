@@ -60,19 +60,19 @@ func processStreamResponse(item string, responseTextBuilder *strings.Builder, to
 	return nil
 }
 
-func processTokens(relayMode int, streamItems []string, responseTextBuilder *strings.Builder, toolCount *int) error {
+func processTokens(relayMode int, streamItems []string, responseTextBuilder *strings.Builder, thinkResponseTextBuilder *strings.Builder, toolCount *int) error {
 	streamResp := "[" + strings.Join(streamItems, ",") + "]"
 
 	switch relayMode {
 	case relayconstant.RelayModeChatCompletions:
-		return processChatCompletions(streamResp, streamItems, responseTextBuilder, toolCount)
+		return processChatCompletions(streamResp, streamItems, responseTextBuilder, thinkResponseTextBuilder, toolCount)
 	case relayconstant.RelayModeCompletions:
 		return processCompletions(streamResp, streamItems, responseTextBuilder)
 	}
 	return nil
 }
 
-func processChatCompletions(streamResp string, streamItems []string, responseTextBuilder *strings.Builder, toolCount *int) error {
+func processChatCompletions(streamResp string, streamItems []string, responseTextBuilder *strings.Builder, thinkResponseTextBuilder *strings.Builder, toolCount *int) error {
 	var streamResponses []dto.ChatCompletionsStreamResponse
 	if err := json.Unmarshal(common.StringToByteSlice(streamResp), &streamResponses); err != nil {
 		// 一次性解析失败，逐个解析
@@ -89,7 +89,7 @@ func processChatCompletions(streamResp string, streamItems []string, responseTex
 	for _, streamResponse := range streamResponses {
 		for _, choice := range streamResponse.Choices {
 			responseTextBuilder.WriteString(choice.Delta.GetContentString())
-			responseTextBuilder.WriteString(choice.Delta.GetReasoningContent())
+			thinkResponseTextBuilder.WriteString(choice.Delta.GetReasoningContent())
 			if choice.Delta.ToolCalls != nil {
 				if len(choice.Delta.ToolCalls) > *toolCount {
 					*toolCount = len(choice.Delta.ToolCalls)

@@ -11,8 +11,9 @@ import (
 type Conversation struct {
 	ID          string      `gorm:"primaryKey;type:varchar(255);not null" json:"id"`
 	UserID      int         `gorm:"index;not null" json:"user_id"`
+	Username    string      `gorm:"type:varchar(255)" json:"username"`
 	Title       string      `gorm:"type:varchar(255)" json:"title"`
-	Model       string      `gorm:"type:varchar(50)" json:"model"`
+	Type        string      `gorm:"type:varchar(50)" json:"type"`
 	ModelConfig ModelConfig `gorm:"type:json" json:"model_config"`
 	CreatedAt   time.Time   `gorm:"not null" json:"created_at"`
 	UpdatedAt   time.Time   `gorm:"not null" json:"updated_at"`
@@ -36,28 +37,44 @@ func (m ModelConfig) Value() (driver.Value, error) {
 // 根据用户ID获取会话列表
 func GetConversationsByUserID(userID int) ([]*Conversation, error) {
 	var conversations []*Conversation
-	// 开始事务
-	tx := DB.Begin()
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
 	// 构建基础查询
-	err := tx.Where("user_id = ?", userID).
+	err := DB.Where("user_id = ?", userID).
 		Order("created_at desc").
 		Find(&conversations).Error
-
-	// 提交事务
-	if err = tx.Commit().Error; err != nil {
+	if err != nil {
 		return nil, err
 	}
 
 	return conversations, nil
+}
+
+// 获取会话列表
+func ListConversations(username string, title string, conversationType string, startTime int64, endTime int64, startIndex int, limit int) (conversations []*Conversation, total int64, err error) {
+	query := DB.Model(&Conversation{})
+	if username != "" {
+		query = query.Where("username = ?", username)
+	}
+	if title != "" {
+		query = query.Where("title like ?", "%"+title+"%")
+	}
+	if conversationType != "" {
+		query = query.Where("type = ?", conversationType)
+	}
+	if startTime != 0 {
+		query = query.Where("created_at >= ?", time.Unix(startTime, 0))
+	}
+	if endTime != 0 {
+		query = query.Where("created_at <= ?", time.Unix(endTime, 0))
+	}
+	err = query.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	err = query.Order("created_at desc").Limit(limit).Offset(startIndex).Find(&conversations).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return conversations, total, nil
 }
 
 // 创建新的会话

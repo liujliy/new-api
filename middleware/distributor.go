@@ -38,14 +38,14 @@ func Distribute() func(c *gin.Context) {
 		loc, _ := time.LoadLocation("Asia/Shanghai")
 		now := time.Now().In(loc)
 
-		startTimeLimit := c.GetTime("user_start_time_limit")
-		startH, startM, _ := startTimeLimit.Clock()
-		endTimeLimit := c.GetTime("user_end_time_limit")
-		endH, endM, _ := endTimeLimit.Clock()
+		startTimeLimit := c.GetInt64("user_start_time_limit")
+		startH, startM, _ := time.Unix(startTimeLimit, 0).Clock()
+		endTimeLimit := c.GetInt64("user_end_time_limit")
+		endH, endM, _ := time.Unix(endTimeLimit, 0).Clock()
 		// 构造时间对象
 		startTime := time.Date(now.Year(), now.Month(), now.Day(), startH, startM, 0, 0, loc)
 		endTime := time.Date(now.Year(), now.Month(), now.Day(), endH, endM, 0, 0, loc)
-		if (!startTimeLimit.IsZero() && now.Before(startTime)) || (!endTimeLimit.IsZero() && now.After(endTime)) {
+		if (startTimeLimit != 0 && now.Before(startTime)) || (endTimeLimit != 0 && now.After(endTime)) {
 			abortWithOpenAiMessage(c, http.StatusForbidden, "您当前不在允许使用的时间范围内")
 			return
 		}
@@ -219,7 +219,11 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 		c.Set("relay_mode", relayMode)
 	}
 	if strings.HasPrefix(c.Request.URL.Path, "/v1/files") {
-		modelRequest.Model = c.PostForm("model")
+		if c.Request.Method == http.MethodGet {
+			modelRequest.Model = c.Query("model")
+		} else {
+			modelRequest.Model = c.PostForm("model")
+		}
 	}
 	return &modelRequest, shouldSelectChannel, nil
 }
@@ -235,6 +239,9 @@ func SetupContextForSelectedChannel(c *gin.Context, channel *model.Channel, mode
 	c.Set("channel_setting", channel.GetSetting())
 	if nil != channel.OpenAIOrganization && "" != *channel.OpenAIOrganization {
 		c.Set("channel_organization", *channel.OpenAIOrganization)
+	}
+	if nil != channel.SystemPrompt {
+		c.Set("channel_system_prompt", channel.SystemPrompt)
 	}
 	c.Set("auto_ban", channel.GetAutoBan())
 	c.Set("model_mapping", channel.GetModelMapping())

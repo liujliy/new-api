@@ -14,17 +14,17 @@ import (
 
 // UserBase struct remains the same as it represents the cached data structure
 type UserBase struct {
-	Id               int        `json:"id"`
-	Group            string     `json:"group"`
-	Email            string     `json:"email"`
-	Quota            int        `json:"quota"`
-	Status           int        `json:"status"`
-	Username         string     `json:"username"`
-	Setting          string     `json:"setting"`
-	StartTimeLimit   *time.Time `json:"start_time_limit"`
-	EndTimeLimit     *time.Time `json:"end_time_limit"`
-	InputLengthLimit int        `json:"input_length_limit"`
-	OutputImageLimit int        `json:"output_image_limit"`
+	Id               int    `json:"id"`
+	Group            string `json:"group"`
+	Email            string `json:"email"`
+	Quota            int    `json:"quota"`
+	Status           int    `json:"status"`
+	Username         string `json:"username"`
+	Setting          string `json:"setting"`
+	StartTimeLimit   int64  `json:"start_time_limit"`
+	EndTimeLimit     int64  `json:"end_time_limit"`
+	InputLengthLimit int    `json:"input_length_limit"`
+	OutputImageLimit int    `json:"output_image_limit"`
 }
 
 func (user *UserBase) WriteContext(c *gin.Context) {
@@ -119,10 +119,14 @@ func GetUserCache(userId int) (userCache *UserBase, err error) {
 		Username:         user.Username,
 		Setting:          user.Setting,
 		Email:            user.Email,
-		StartTimeLimit:   user.StartTimeLimit,
-		EndTimeLimit:     user.EndTimeLimit,
 		InputLengthLimit: user.InputLengthLimit,
 		OutputImageLimit: user.OutputImageLimit,
+	}
+	if user.StartTimeLimit != nil {
+		userCache.StartTimeLimit = user.StartTimeLimit.Unix()
+	}
+	if user.EndTimeLimit != nil {
+		userCache.EndTimeLimit = user.EndTimeLimit.Unix()
 	}
 
 	return userCache, nil
