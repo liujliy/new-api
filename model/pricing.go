@@ -15,6 +15,7 @@ type Pricing struct {
 	OwnerBy         string   `json:"owner_by"`
 	CompletionRatio float64  `json:"completion_ratio"`
 	EnableGroup     []string `json:"enable_groups,omitempty"`
+	Tags            []string `json:"tags,omitempty"`
 }
 
 var (
@@ -27,7 +28,7 @@ func GetPricing() []Pricing {
 	updatePricingLock.Lock()
 	defer updatePricingLock.Unlock()
 
-	if time.Since(lastGetPricingTime) > time.Minute*1 || len(pricingMap) == 0 {
+	if time.Since(lastGetPricingTime) > time.Second*30 || len(pricingMap) == 0 {
 		updatePricing()
 	}
 	//if group != "" {
@@ -48,15 +49,22 @@ func updatePricing() {
 	//modelRatios := common.GetModelRatios()
 	enableAbilities := GetAllEnableAbilities()
 	modelGroupsMap := make(map[string][]string)
+	modelTagsMap := make(map[string][]string)
 	for _, ability := range enableAbilities {
 		groups := modelGroupsMap[ability.Model]
+		tags := modelTagsMap[ability.Model]
 		if groups == nil {
 			groups = make([]string, 0)
+			tags = make([]string, 0)
 		}
 		if !common.StringsContains(groups, ability.Group) {
 			groups = append(groups, ability.Group)
+			if ability.Tag != nil {
+				tags = append(tags, *ability.Tag)
+			}
 		}
 		modelGroupsMap[ability.Model] = groups
+		modelTagsMap[ability.Model] = tags
 	}
 
 	pricingMap = make([]Pricing, 0)
@@ -64,6 +72,7 @@ func updatePricing() {
 		pricing := Pricing{
 			ModelName:   model,
 			EnableGroup: groups,
+			Tags:        modelTagsMap[model],
 		}
 		modelPrice, findPrice := operation_setting.GetModelPrice(model, false)
 		if findPrice {
