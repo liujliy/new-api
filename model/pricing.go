@@ -28,7 +28,7 @@ func GetPricing() []Pricing {
 	updatePricingLock.Lock()
 	defer updatePricingLock.Unlock()
 
-	if time.Since(lastGetPricingTime) > time.Second*10 || len(pricingMap) == 0 {
+	if time.Since(lastGetPricingTime) > time.Second*2 || len(pricingMap) == 0 {
 		updatePricing()
 	}
 	//if group != "" {
