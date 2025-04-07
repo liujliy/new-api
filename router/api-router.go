@@ -111,8 +111,10 @@ func SetApiRouter(router *gin.Engine) {
 			tokenRoute.GET("/search", controller.SearchTokens)
 			tokenRoute.GET("/list", controller.ListTokens)
 			tokenRoute.GET("/:id", controller.GetToken)
+			tokenRoute.GET("/:id/info", controller.GetTokenById)
 			tokenRoute.POST("/", controller.AddToken)
 			tokenRoute.PUT("/", controller.UpdateToken)
+			tokenRoute.PUT("/info", controller.UpdateTokenInfo)
 			tokenRoute.DELETE("/:id", controller.DeleteToken)
 		}
 		redemptionRoute := apiRouter.Group("/redemption")
