@@ -136,6 +136,19 @@ const ModelPricing = () => {
       filteredValue,
     },
     {
+      title: t('模型作用'),
+      dataIndex: 'tags',
+      render: (text, record, index) => {
+        let content
+       if(text[0]!=""){
+        content=<Tag>{text[0]}</Tag>
+       }else{
+        content=<></>
+       }
+       return content;
+      },
+    },
+    {
       title: t('计费类型'),
       dataIndex: 'quota_type',
       render: (text, record, index) => {

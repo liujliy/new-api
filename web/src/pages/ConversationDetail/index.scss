@@ -1,16 +1,14 @@
+.semi-layout-content{
+    flex: 1 !important;
+    height: calc(100vh - 10px) !important;
+}
 .chatcontent{
-    height:100vh;
+    height: calc(100vh - 100px);
     display: flex;
     flex-direction: column;
     align-items: center;
 
-    .semi-layout-content{
-        height: calc(100vh - 90px) ;
-        // display: flex;
-        // flex-direction: column;
-        // align-items: center;
-        
-    }
+  
     
     .semi-chat{
         width: 80%;

@@ -67,7 +67,6 @@ export default defineConfig({
         target: "https://www.qiansuoda.com/ai-admin/pg/", // 目标服务器地址
         changeOrigin: true, // 允许跨域
         rewrite: (path) => path.replace(/^\/v1/, ""),
-
       },
     }:{},
   },

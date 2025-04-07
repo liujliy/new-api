@@ -23,7 +23,7 @@ const renderType = (type, t) => {
     case 'image_generate':
       return (
         <Tag color='yellow' size='large'>
-          {t('image_generate')}
+          {t('文生图')}
         </Tag>
       );
     default:
@@ -308,8 +308,8 @@ const TableConversation = () => {
         }}
         labelPosition='left'
       >
-        <div style={{ display: 'flex' }}>
-          <Space>
+        <div style={{ display: 'flex',width: '100%' }}>
+          <Space style={{ width: '100%' }}>
             <Tooltip
               content={t('支持搜索用户的 ID、用户名、显示名称和邮箱地址')}
             >
@@ -324,7 +324,9 @@ const TableConversation = () => {
                 onChange={(value) => handleTitleChange(value)}
               />
 
-              <Form.Input
+             
+            </Tooltip>
+            <Form.Input
                 label={t('搜索  用户')}
                 icon='search'
                 field='keyword'
@@ -334,9 +336,6 @@ const TableConversation = () => {
                 loading={searching}
                 onChange={(value) => handleUsernameChange(value)}
               />
-            </Tooltip>
-
-     
             <Button
               label={t('查询')}
               type='primary'
