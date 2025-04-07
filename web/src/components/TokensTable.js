@@ -197,7 +197,7 @@ const TokensTable = () => {
             >
               {t('复制')}
             </Button>
-            <SplitButtonGroup
+            {/* <SplitButtonGroup
               style={{ marginRight: 1 }}
               aria-label={t('项目操作按钮组')}
             >
@@ -228,7 +228,7 @@ const TokensTable = () => {
                   icon={<IconTreeTriangleDown />}
                 ></Button>
               </Dropdown>
-            </SplitButtonGroup>
+            </SplitButtonGroup> */}
             <Popconfirm
               title={t('确定是否要删除此令牌？')}
               content={t('此修改将不可逆')}
@@ -399,15 +399,15 @@ const TokensTable = () => {
     let res;
     switch (action) {
       case 'delete':
-        res = await API.delete(`/api/token/${id}/`);
+        res = await API.delete(`/api/token/${id}/info`);
         break;
       case 'enable':
         data.status = 1;
-        res = await API.put('/api/token/?status_only=true', data);
+        res = await API.put('/api/token/info?status_only=true', data);
         break;
       case 'disable':
         data.status = 2;
-        res = await API.put('/api/token/?status_only=true', data);
+        res = await API.put('/api/token/info?status_only=true', data);
         break;
     }
     const { success, message } = res.data;

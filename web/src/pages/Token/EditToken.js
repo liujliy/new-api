@@ -110,7 +110,7 @@ const EditToken = (props) => {
 
   const loadToken = async () => {
     setLoading(true);
-    let res = await API.get(`/api/token/${props.editingToken.id}`);
+    let res = await API.get(`/api/token/${props.editingToken.id}/info`);
     const { success, message, data } = res.data;
     if (success) {
       if (data.expired_time !== -1) {
@@ -184,7 +184,7 @@ const EditToken = (props) => {
         localInputs.expired_time = Math.ceil(time / 1000);
       }
       localInputs.model_limits = localInputs.model_limits.join(',');
-      let res = await API.put(`/api/token/`, {
+      let res = await API.put(`/api/token/info`, {
         ...localInputs,
         id: parseInt(props.editingToken.id),
       });
@@ -217,7 +217,7 @@ const EditToken = (props) => {
           localInputs.expired_time = Math.ceil(time / 1000);
         }
         localInputs.model_limits = localInputs.model_limits.join(',');
-        let res = await API.post(`/api/token/`, localInputs);
+        let res = await API.post(`/api/token/info`, localInputs);
         const { success, message } = res.data;
 
         if (success) {
