@@ -7,48 +7,47 @@ import {
   IconSidebar,
   IconChevronDown,
 } from '@douyinfe/semi-icons';
-import './index.scss'
+import './index.scss';
 const roleInfo = {
   user: {
-    name: 'User',
+    name: '用户',
     avatar:
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/ptlz_zlp/ljhwZthlaukjlkulzlp/docs-icon.png',
+      'https://ziyile-1347238265.cos.ap-guangzhou.myqcloud.com/Beijixing/assets/star.png',
   },
   assistant: {
-    name: 'Assistant',
+    name: '小星星',
     avatar:
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/ptlz_zlp/ljhwZthlaukjlkulzlp/other/logo.png',
+      'https://ziyile-1347238265.cos.ap-guangzhou.myqcloud.com/Beijixing/assets/icon.png',
   },
   system: {
-    name: 'System',
+    name: '小星星',
     avatar:
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/ptlz_zlp/ljhwZthlaukjlkulzlp/other/logo.png',
+      'https://ziyile-1347238265.cos.ap-guangzhou.myqcloud.com/Beijixing/assets/icon.png',
   },
 };
 
 const ConversationDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id,type } = location.state || {};
+  const { id, type } = location.state || {};
   const [message, setMessage] = useState();
 
   useEffect(() => {
     loadConversation();
   }, []);
 
-  
-
-
   const detailStr = (str) => {
     const match = str.match(/<think>([\s\S]*?)<\/think>([\s\S]*)/);
     if (match) {
-        const contentInside = match[1];
-        const contentOutside = match[2];
-        const formattedReasoningContent = contentInside.split('\n').map(line => `> ${line}`).join('\n');
-        return formattedReasoningContent+contentOutside
-
+      const contentInside = match[1];
+      const contentOutside = match[2];
+      const formattedReasoningContent = contentInside
+        .split('\n')
+        .map((line) => `> ${line}`)
+        .join('\n');
+      return formattedReasoningContent + contentOutside;
     } else {
-        return str;
+      return str;
     }
   };
 
@@ -56,50 +55,47 @@ const ConversationDetail = () => {
     const res = await API.get(`/api/conversation/${id}/messages`);
     const { success, message, data } = res.data;
     if (success) {
-        setMessage(data);
+      setMessage(data);
 
-        setMessage((messages) => {
-          return messages.map((element) => {
-            const newElement = { ...element };
-        
-            try {
-              if (newElement.content_type === "text") {
-                newElement.content = detailStr(newElement.content);
-              } else if (newElement.content_type === "image") {
-                const parsed = JSON.parse(newElement.content);
-                if (Array.isArray(parsed.data)) {
-                  newElement.content = parsed.data.map(e => ({
-                    type: "image_url",
-                    image_url: { url: e.url }
-                  }));
-                } else {
-                  console.warn("Invalid image data format", parsed);
-                  newElement.content = [];
-                }
+      setMessage((messages) => {
+        return messages.map((element) => {
+          const newElement = { ...element };
+
+          try {
+            if (newElement.content_type === 'text') {
+              newElement.content = detailStr(newElement.content);
+            } else if (newElement.content_type === 'image') {
+              const parsed = JSON.parse(newElement.content);
+              if (Array.isArray(parsed.data)) {
+                newElement.content = parsed.data.map((e) => ({
+                  type: 'image_url',
+                  image_url: { url: e.url },
+                }));
               } else {
-                newElement.content = JSON.parse(newElement.content);
+                console.warn('Invalid image data format', parsed);
+                newElement.content = [];
               }
-            } catch (error) {
-              console.error("Error parsing content:", error, newElement);
-              // 这里可以考虑是否保留原始 content 或设置为 null
+            } else {
+              newElement.content = JSON.parse(newElement.content);
             }
-        
-            return newElement;
-          });
+          } catch (error) {
+            console.error('Error parsing content:', error, newElement);
+            // 这里可以考虑是否保留原始 content 或设置为 null
+          }
+
+          return newElement;
         });
-        
+      });
     } else {
       showError(message);
     }
     // setLoading(false);
   };
 
-
   const commonOuterStyle = {
     border: '1px solid var(--semi-color-border)',
     borderRadius: '16px',
     margin: '8px 16px',
-    height: 'calc(100vh -90px)',
   };
   //输入框为空
   const renderInputArea = useCallback((props) => {
@@ -108,17 +104,18 @@ const ConversationDetail = () => {
 
   return (
     <div className='chatcontent'>
-    <div style={{width:'100%', display:'flex'}}><Button
-        icon={<IconArrowLeft />}
-        theme='solid'
-        style={{ marginRight: 10 }}
-        onClick={() => {
-          navigate('/conversation');
-        }}
-      >
-        返回
-      </Button></div>
-      
+      <div style={{ width: '100%', display: 'flex' }}>
+        <Button
+          icon={<IconArrowLeft />}
+          theme='solid'
+          style={{ marginRight: 10 }}
+          onClick={() => {
+            navigate('/conversation');
+          }}
+        >
+          返回
+        </Button>
+      </div>
 
       <Chat
         mode={'userBubble'}
