@@ -279,6 +279,18 @@ func DeleteTokenById(id int, userId int) (err error) {
 	return token.Delete()
 }
 
+func DeleteToken(id int) (err error) {
+	if id == 0 {
+		return errors.New("id 为空！")
+	}
+	token := Token{Id: id}
+	err = DB.Where(token).First(&token).Error
+	if err != nil {
+		return err
+	}
+	return token.Delete()
+}
+
 func IncreaseTokenQuota(id int, key string, quota int) (err error) {
 	if quota < 0 {
 		return errors.New("quota 不能为负数！")
