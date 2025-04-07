@@ -323,7 +323,7 @@ const TokensTable = () => {
   );
   const loadTokens = async (startIdx) => {
     setLoading(true);
-    const res = await API.get(`/api/token/?p=${startIdx}&size=${pageSize}`);
+    const res = await API.get(`/api/token/list?p=${startIdx}&size=${pageSize}`);
     const { success, message, data } = res.data;
     if (success) {
       if (startIdx === 0) {
