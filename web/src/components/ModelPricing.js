@@ -408,8 +408,11 @@ const ModelPricing = () => {
     const { success, message } = res.data;
 
     if (success) {
-      showSuccess('价格修改成功');
-      loadPricing()
+      setTimeout(() => {
+        loadPricing();
+        showSuccess('价格修改成功');
+
+      },1000)
     } else {
       showError(message);
     }
@@ -429,14 +432,17 @@ const ModelPricing = () => {
     const { success, message } = res.data;
 
     if (success) {
-      showSuccess('价格修改成功');
-      loadPricing()
+        //修改对应数据
+      setTimeout(() => {
+        showSuccess('价格修改成功');
+
+        loadPricing();
+      },1000)
     } else {
       showError(message);
     }
 
     setLoading(false);
-    // 
 
   }
 
@@ -456,7 +462,6 @@ const ModelPricing = () => {
   const OpenChangeModal = (record, inputRatioPrice) => {
     setSelectModelData(record);
     SetInputValue(inputRatioPrice);
-    
     setModalVisible(true);
   };
 
@@ -478,7 +483,7 @@ const ModelPricing = () => {
       changePrice();
     }
     setModalVisible(false);
-    //修改对应数据
+  
   };
   const handleCancel = () => {
     setModalVisible(false);

@@ -146,7 +146,6 @@ const TableConversation = () => {
   };
 
   const loadUsers = async (startIdx, pageSize) => {
-    console.log("pageL",activePage)
 
     try {
       const res = await API.get(
@@ -293,7 +292,6 @@ const TableConversation = () => {
   // };
 
   const handlePageSizeChange = async (size) => {
-    console.log("size:", size);
     localStorage.setItem('page-size', size + '');
     setPageSize(size);
     setActivePage(1);
