@@ -12,6 +12,7 @@ type Message struct {
 	Role           string    `gorm:"type:varchar(20);not null" json:"role"`
 	Content        string    `gorm:"type:text;not null" json:"content"`
 	ContentType    string    `gorm:"type:varchar(20);not null" json:"content_type"`
+	AudioUrl       *string   `gorm:"type:varchar(500);" json:"audio_url"`
 	CreatedAt      time.Time `gorm:"not null;index" json:"created_at"`
 }
 
@@ -29,6 +30,13 @@ func GetMessagesByConversationID(conversationID string) ([]*Message, error) {
 func (message *Message) Insert() error {
 	err := DB.Create(message).Error
 	return err
+}
+
+// 更新消息
+func (message *Message) Update() error {
+	newMessage := *message
+	DB.First(&message, message.ID)
+	return DB.Model(message).Updates(newMessage).Error
 }
 
 // 清理会话
