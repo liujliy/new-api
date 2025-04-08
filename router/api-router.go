@@ -181,6 +181,10 @@ func SetApiRouter(router *gin.Engine) {
 		{
 			volcRoute.POST("/proxy", controller.ProxyAIGC)
 			volcRoute.GET("/rtc/token", controller.GetRTCToken)
+			// tts
+			volcRoute.POST("/tts/submit", controller.SubmitTtsTask)
+			volcRoute.POST("/tts/refresh", controller.RefreshTtsTaskResult)
+			volcRoute.GET("/tts/:id/task", controller.GetTtsTaskById)
 		}
 	}
 }
