@@ -24,16 +24,16 @@ const Setting = () => {
       content: <OperationSetting />,
       itemKey: 'operation',
     });
-    panes.push({
-      tab: t('速率限制设置'),
-      content: <RateLimitSetting />,
-      itemKey: 'ratelimit',
-    });
-    panes.push({
-      tab: t('模型相关设置'),
-      content: <ModelSetting />,
-      itemKey: 'models',
-    });
+    // panes.push({
+    //   tab: t('速率限制设置'),
+    //   content: <RateLimitSetting />,
+    //   itemKey: 'ratelimit',
+    // });
+    // panes.push({
+    //   tab: t('模型相关设置'),
+    //   content: <ModelSetting />,
+    //   itemKey: 'models',
+    // });
     panes.push({
       tab: t('系统设置'),
       content: <SystemSetting />,
