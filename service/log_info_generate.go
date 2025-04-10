@@ -3,6 +3,7 @@ package service
 import (
 	"one-api/dto"
 	relaycommon "one-api/relay/common"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,6 +27,21 @@ func GenerateTextOtherInfo(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, m
 	}
 	adminInfo := make(map[string]interface{})
 	adminInfo["use_channel"] = ctx.GetStringSlice("use_channel")
+	other["admin_info"] = adminInfo
+	return other
+}
+
+func GenerateVolcOtherInfo(channelId int, modelPrice, groupRatio float64) map[string]interface{} {
+	other := make(map[string]interface{})
+	other["model_ratio"] = 0.0
+	other["group_ratio"] = groupRatio
+	other["completion_ratio"] = 0.0
+	other["cache_tokens"] = 0.0
+	other["cache_ratio"] = 0.0
+	other["model_price"] = modelPrice
+	other["frt"] = 0.0
+	adminInfo := make(map[string]interface{})
+	adminInfo["use_channel"] = []string{strconv.Itoa(channelId)}
 	other["admin_info"] = adminInfo
 	return other
 }

@@ -37,3 +37,7 @@ type VolcTTSTaskResult struct {
 	Code       int    `json:"code"`
 	Message    string `json:"message"`
 }
+
+type VolcConsumeReq struct {
+	UseTime int `json:"use_time"`
+}
