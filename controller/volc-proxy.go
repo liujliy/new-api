@@ -138,8 +138,22 @@ func Consume(c *gin.Context) {
 	groupRatio := setting.GetGroupRatio(group)
 	userQuota, _ := model.GetUserQuota(userId, false)
 	tokens, _ := model.GetAllUserTokens(userId, 0, 1)
+	if len(tokens) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "用户没有可用的token，请联系管理员",
+			"success": false,
+		})
+		return
+	}
 	token := tokens[0]
 	channel, _ := model.CacheGetRandomSatisfiedChannel(group, "volc-chat", 0)
+	if channel == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "没有可用的AI通话渠道，请联系管理员",
+			"success": false,
+		})
+		return
+	}
 	channelId := (*channel).Id
 	modelPrice, success := operation_setting.GetModelPrice("volc-chat", false)
 	if !success {
@@ -155,6 +169,14 @@ func Consume(c *gin.Context) {
 	// 记录日志
 	other := service.GenerateVolcOtherInfo(channelId, modelPrice, groupRatio)
 	model.RecordConsumeLog(c, userId, channelId, 1, 1, "volc-chat", token.Name, quota, "AI通话", token.Id, userQuota, consumeReq.UseTime, true, group, other)
+	// 更新完后，如果欠费，则不允许继续使用
+	if userQuota < quota {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "用户额度不足，请充值",
+			"success": false,
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
