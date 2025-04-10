@@ -394,7 +394,7 @@ const SystemSetting = () => {
     <Grid columns={1}>
       <Grid.Column>
         <Form loading={loading} inverted={isDark}>
-          <Header as='h3' inverted={isDark}>
+          {/* <Header as='h3' inverted={isDark}>
             通用设置
           </Header>
           <Form.Group widths='equal'>
@@ -512,7 +512,7 @@ const SystemSetting = () => {
             />
           </Form.Group>
           <Form.Button onClick={submitPayAddress}>更新支付设置</Form.Button>
-          <Divider />
+          <Divider /> */}
           <Header as='h3' inverted={isDark}>
             配置登录注册
           </Header>
@@ -564,7 +564,7 @@ const SystemSetting = () => {
               name='EmailVerificationEnabled'
               onChange={handleInputChange}
             />
-            <Form.Checkbox
+            {/* <Form.Checkbox
               checked={inputs.GitHubOAuthEnabled === 'true'}
               label='允许通过 GitHub 账户登录 & 注册'
               name='GitHubOAuthEnabled'
@@ -593,7 +593,7 @@ const SystemSetting = () => {
               label='允许通过 Telegram 进行登录'
               name='TelegramOAuthEnabled'
               onChange={handleInputChange}
-            />
+            /> */}
           </Form.Group>
           <Form.Group inline>
             <Form.Checkbox
@@ -602,12 +602,12 @@ const SystemSetting = () => {
               name='RegisterEnabled'
               onChange={handleInputChange}
             />
-            <Form.Checkbox
+            {/* <Form.Checkbox
               checked={inputs.TurnstileCheckEnabled === 'true'}
               label='启用 Turnstile 用户校验'
               name='TurnstileCheckEnabled'
               onChange={handleInputChange}
-            />
+            /> */}
           </Form.Group>
           <Divider />
           <Header as='h3' inverted={isDark}>
@@ -734,7 +734,7 @@ const SystemSetting = () => {
           </Form.Group>
           <Form.Button onClick={submitSMTP}>保存 SMTP 设置</Form.Button>
           <Divider />
-          <Header as='h3' inverted={isDark}>
+          {/* <Header as='h3' inverted={isDark}>
             配置 GitHub OAuth App
             <Header.Subheader>
               用以支持通过 GitHub 进行登录注册，
@@ -983,7 +983,7 @@ const SystemSetting = () => {
           </Form.Group>
           <Form.Button onClick={submitOIDCSettings}>
             保存 OIDC 设置
-          </Form.Button>
+          </Form.Button> */}
         </Form>
       </Grid.Column>
     </Grid>
