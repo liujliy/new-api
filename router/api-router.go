@@ -181,6 +181,8 @@ func SetApiRouter(router *gin.Engine) {
 		{
 			volcRoute.POST("/proxy", controller.ProxyAIGC)
 			volcRoute.GET("/rtc/token", controller.GetRTCToken)
+			// volc-chat consume
+			volcRoute.POST("/chat/consume", controller.Consume)
 			// tts
 			volcRoute.POST("/tts/submit", controller.SubmitTtsTask)
 			volcRoute.POST("/tts/refresh", controller.RefreshTtsTaskResult)

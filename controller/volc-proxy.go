@@ -8,6 +8,8 @@ import (
 	"one-api/dto"
 	"one-api/model"
 	"one-api/service"
+	"one-api/setting"
+	"one-api/setting/operation_setting"
 	"os"
 	"strconv"
 	"strings"
@@ -119,6 +121,45 @@ func GetRTCToken(c *gin.Context) {
 		"success": true,
 		"data":    tokenStr,
 	})
+}
+
+func Consume(c *gin.Context) {
+	var consumeReq dto.VolcConsumeReq
+	if err := c.ShouldBindJSON(&consumeReq); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": err.Error(),
+			"success": false,
+		})
+		return
+	}
+	// 获取价格等各种参数
+	userId := c.GetInt("id")
+	group, _ := model.GetUserGroup(userId, false)
+	groupRatio := setting.GetGroupRatio(group)
+	userQuota, _ := model.GetUserQuota(userId, false)
+	tokens, _ := model.GetAllUserTokens(userId, 0, 1)
+	token := tokens[0]
+	channel, _ := model.CacheGetRandomSatisfiedChannel(group, "volc-chat", 0)
+	channelId := (*channel).Id
+	modelPrice, success := operation_setting.GetModelPrice("volc-chat", false)
+	if !success {
+		// 默认价格2.0
+		modelPrice = 2.0
+	}
+	quota := int(modelPrice * common.QuotaPerUnit * groupRatio)
+	// 记录用户使用的费用
+	model.UpdateUserUsedQuotaAndRequestCount(userId, quota)
+	model.UpdateChannelUsedQuota(channelId, quota)
+	// 减少用户的额度
+	model.DecreaseUserQuota(userId, quota)
+	// 记录日志
+	other := service.GenerateVolcOtherInfo(channelId, modelPrice, groupRatio)
+	model.RecordConsumeLog(c, userId, channelId, 1, 1, "volc-chat", token.Name, quota, "AI通话", token.Id, userQuota, consumeReq.UseTime, true, group, other)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+	})
+	return
 }
 
 func GetTtsTaskById(c *gin.Context) {
